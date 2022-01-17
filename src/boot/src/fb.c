@@ -204,5 +204,5 @@ void fb_init()
 
     set_mode(1280, 720);
     clear();
-    //julia();
+    julia();
 }

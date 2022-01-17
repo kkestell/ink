@@ -1,1 +1,3 @@
 # Ink
+
+![Ink](screenshot.png)
