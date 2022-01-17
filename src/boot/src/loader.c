@@ -36,7 +36,7 @@ UEFI_STATUS load_kernel()
         return status;
     }
 
-	UINT8* elf_identity_buffer;
+    UINT8* elf_identity_buffer;
 
     status = read_elf_identity(kernel_image_file, &elf_identity_buffer);
     if (status)
@@ -59,8 +59,8 @@ UEFI_STATUS load_kernel()
         return status;
     }
 
-	void* kernel_header;
-	void* kernel_program_headers;
+    void* kernel_header;
+    void* kernel_program_headers;
 
     status = read_elf_file(kernel_image_file, &kernel_header, &kernel_program_headers);
     if (status)
