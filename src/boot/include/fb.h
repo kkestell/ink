@@ -1,20 +1,9 @@
-#ifndef __BOOT_FB_H
-#define __BOOT_FB_H
+#ifndef _FB_H
+#define _FB_H
 
-typedef struct rgb_color
-{
-    unsigned char r;
-    unsigned char g;
-    unsigned char b;
-} rgb_color;
+#include "uefi.h"
+#include "boot_info.h"
 
-typedef struct hsv_color
-{
-    unsigned char h;
-    unsigned char s;
-    unsigned char v;
-} hsv_color;
+UEFI_STATUS fb_init(kernel_boot_info *boot_info);
 
-void fb_init();
-
-#endif
+#endif // _FB_H
