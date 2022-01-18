@@ -1,5 +1,5 @@
-#ifndef __BOOT_UEFI_H
-#define __BOOT_UEFI_H
+#ifndef _UEFI_H
+#define _UEFI_H
 
 // ============================================================================
 // Basic types and constants
@@ -112,6 +112,16 @@ typedef struct UEFI_TABLE_HEADER {
 struct UEFI_SYSTEM_TABLE;
 
 // ============================================================================
+// Error handling
+// ============================================================================
+
+#include <stddef.h>
+
+#define UEFI_ERROR(status) (((INTN)(UINTN)(status)) < 0)
+
+const wchar_t* uefi_error_message(UEFI_STATUS const status);
+
+// ============================================================================
 // Guids
 // ============================================================================
 
@@ -138,10 +148,17 @@ struct UEFI_SYSTEM_TABLE;
 #define UEFI_ACPI_TABLE_GUID    {0x8868e871, 0xe4f1, 0x11d3, {0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81}}
 #define UEFI_ACPI_20_TABLE_GUID UEFI_ACPI_TABLE_GUID
 
+// ============================================================================
+// Macros
+// ============================================================================
+
+#define UEFI_PAGE_MASK  0xFFF 
+#define UEFI_PAGE_SHIFT 12
+
+#define UEFI_SIZE_TO_PAGES(size) (((size) >> UEFI_PAGE_SHIFT) + (((size) & UEFI_PAGE_MASK) ? 1 : 0))
+
 /*
- * efi-stip.h
- *
- * The UEFI Simple Text Input Protocol.
+ * Simple Text Input Protocol.
  */
 
 typedef struct UEFI_INPUT_KEY {
@@ -161,9 +178,7 @@ typedef struct UEFI_SIMPLE_TEXT_INPUT_PROTOCOL {
 } UEFI_SIMPLE_TEXT_INPUT_PROTOCOL;
 
 /*
- * efi-stop.h
- *
- * UEFI Simple Text Output Protocol.
+ * Simple Text Output Protocol.
  */
 
 typedef struct SIMPLE_TEXT_OUTPUT_MODE {
@@ -201,9 +216,7 @@ typedef struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL {
 } UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL;
 
 /*
- * efi-time.h
- *
- * UEFI Time representation.
+ * Time.
  */
 
 #define UEFI_TIME_ADJUST_DAYLIGHT    0x01
@@ -232,9 +245,7 @@ typedef struct UEFI_TIME_CAPABILITIES {
 } UEFI_TIME_CAPABILITIES;
 
 /*
- * efi-rs.h
- *
- * UEFI Runtime Services.
+ * Runtime Services.
  */
 
 #define UEFI_OPTIONAL_POINTER                0x00000001
@@ -299,9 +310,7 @@ typedef struct UEFI_RUNTIME_SERVICES {
 } UEFI_RUNTIME_SERVICES;
 
 /*
- * efi-dpp.h
- *
- * UEFI device path protocol.
+ * Device Path Protocol
  */
 
 
@@ -319,9 +328,7 @@ typedef struct UEFI_DEVICE_PATH_PROTOCOL {
 } UEFI_DEVICE_PATH_PROTOCOL;
 
 /*
- * efi-bs.h
- *
- * UEFI Boot Services.
+ * Boot Services
  */
 
 #define EVT_TIMER                               0x80000000
@@ -487,9 +494,7 @@ typedef struct UEFI_BOOT_SERVICES {
 } UEFI_BOOT_SERVICES;
 
 /*
- * efi-ct.h
- *
- * UEFI Configuration Table.
+ * Configuration Table
  */
 
 
@@ -499,9 +504,7 @@ typedef struct UEFI_CONFIGURATION_TABLE {
 } UEFI_CONFIGURATION_TABLE;
 
 /*
- * efi-acpitp.h
- *
- * UEFI ACPI table protocol.
+ * ACPI Table Protocol
  */
 
 
@@ -516,9 +519,7 @@ typedef struct UEFI_ACPI_TABLE_PROTOCOL {
 } UEFI_ACPI_TABLE_PROTOCOL;
 
 /*
- * efi-fp.h
- *
- * UEFI File Protocol.
+ * File Protocol
  */
 
 #define UEFI_FILE_INFO_ID                {0x09576e92, 0x6d3f, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}}
@@ -549,7 +550,6 @@ typedef struct UEFI_FILE_INFO {
     UEFI_TIME    LastAccessTime;
     UEFI_TIME    ModificationTime;
     UINT64      Attribute;
-    //CHAR16      FileName[];
     CHAR16      *FileName;
 } UEFI_FILE_INFO;
 
@@ -609,11 +609,8 @@ typedef struct UEFI_FILE_PROTOCOL {
 } UEFI_FILE_PROTOCOL;
 
 /*
- * efi-gop.h
- *
- * UEFI graphics output protocol.
+ * Graphics Output Protocol
  */
-
 
 typedef struct UEFI_PIXEL_BITMASK {
     UINT32  RedMask;
@@ -634,18 +631,18 @@ typedef struct UEFI_GRAPHICS_OUTPUT_MODE_INFORMATION {
     UINT32                      Version;
     UINT32                      HorizontalResolution;
     UINT32                      VerticalResolution;
-    UEFI_GRAPHICS_PIXEL_FORMAT   PixelFormat;
-    UEFI_PIXEL_BITMASK           PixelInformation;
+    UEFI_GRAPHICS_PIXEL_FORMAT  PixelFormat;
+    UEFI_PIXEL_BITMASK          PixelInformation;
     UINT32                      PixelsPerScanLine;
 } UEFI_GRAPHICS_OUTPUT_MODE_INFORMATION;
 
 typedef struct UEFI_GRAPHICS_OUTPUT_PROTOCOL_MODE {
-    UINT32                                  MaxMode;
-    UINT32                                  Mode;
-    UEFI_GRAPHICS_OUTPUT_MODE_INFORMATION    *Info;
-    UINTN                                   SizeOfInfo;
-    UEFI_PHYSICAL_ADDRESS                    FrameBufferBase;
-    UINTN                                   FrameBufferSize;
+    UINT32                                MaxMode;
+    UINT32                                Mode;
+    UEFI_GRAPHICS_OUTPUT_MODE_INFORMATION *Info;
+    UINTN                                 SizeOfInfo;
+    UEFI_PHYSICAL_ADDRESS                 FrameBufferBase;
+    UINTN                                 FrameBufferSize;
 } UEFI_GRAPHICS_OUTPUT_PROTOCOL_MODE;
 
 typedef struct UEFI_GRAPHICS_OUTPUT_BLT_PIXEL {
@@ -677,18 +674,8 @@ typedef struct UEFI_GRAPHICS_OUTPUT_PROTOCOL {
 } UEFI_GRAPHICS_OUTPUT_PROTOCOL;
 
 /*
- * efi-lidpp.h
- * 
- * Loaded Image Device Path Protocol.
+ * Loaded Image Protocol
  */
-
-
-/*
- * efi-lip.h
- * 
- * UEFI Loaded Image Protocol.
- */
-
 
 #define UEFI_LOADED_IMAGE_PROTOCOL_REVISION  0x1000
 
@@ -710,9 +697,7 @@ typedef struct UEFI_LOADED_IMAGE_PROTOCOL {
 } UEFI_LOADED_IMAGE_PROTOCOL;
 
 /*
- * efi-sfsp.h
- *
- * UEFI Simple File System Protocol.
+ * Simple File System Protocol
  */
 
 #define UEFI_SIMPLE_FILE_SYSTEM_PROTOCOL_REVISION    0x00010000
@@ -727,33 +712,8 @@ typedef struct UEFI_SIMPLE_FILE_SYSTEM_PROTOCOL {
     UEFI_SIMPLE_FILE_SYSTEM_PROTOCOL_OPEN_VOLUME OpenVolume;
 } UEFI_SIMPLE_FILE_SYSTEM_PROTOCOL;
 
-/*******************************************************************************
- * efi-vmpp.h
- *
- * UEFI VGA Mini Port Protocol.
- */
-
 /*
-struct UEFI_VGA_MINI_PORT_PROTOCOL;
-
-typedef UEFI_STATUS (*UEFI_VGA_MINI_PORT_SET_MODE)(UEFI_VGA_MINI_PORT_PROTOCOL *This, UINTN ModeNumber);
-
-typedef struct UEFI_VGA_MINI_PORT_PROTOCOL {
-    UEFI_VGA_MINI_PORT_SET_MODE SetMode;
-    UINT64                      VgaMemoryOffset;
-    UINT64                      CrtcAddressRegisterOffset;
-    UINT64                      CrtcDataRegisterOffset;
-    UINT8                       VgaMemoryBar;
-    UINT8                       CrtcAddressRegisterBar;
-    UINT8                       CrtcDataRegisterBar;
-    UINT8                       MaxMode;
-} UEFI_VGA_MINI_PORT_PROTOCOL;
-*/
-
-/*
- * efi-st.h
- *
- * The UEFI System Table.
+ * System Table
  */
 
 typedef struct UEFI_SYSTEM_TABLE {
@@ -776,4 +736,4 @@ UEFI_SYSTEM_TABLE* uefi_system_table;
 
 void uefi_init(void *ih, UEFI_SYSTEM_TABLE *st);
 
-#endif // __BOOT_UEFI_H
+#endif // _UEFI_H

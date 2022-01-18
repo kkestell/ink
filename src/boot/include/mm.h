@@ -1,7 +1,9 @@
-#ifndef __BOOT_MM_H
-#define __BOOT_MM_H
+#ifndef _MM_H
+#define _MM_H
 
-void mm_init();
-void mm_debug();
+#include "uefi.h"
+#include "boot_info.h"
 
-#endif
+UEFI_STATUS mm_init(UINTN *memory_map_key, kernel_boot_info *boot_info);
+
+#endif // _MM_H

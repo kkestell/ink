@@ -1,10 +1,9 @@
-#include "utils.h"
+#include "printf.h"
 
-typedef void (*putcf)(void*, uint16_t);
+typedef void (*putcf)(wchar_t);
 static putcf stdout_putf;
-static void* stdout_putp;
 
-static void uli2a(unsigned long int num, unsigned int base, int uc, uint16_t* bf)
+static void uli2a(unsigned long int num, unsigned int base, int uc, wchar_t* bf)
 {
     int n = 0;
     unsigned int d = 1;
@@ -26,7 +25,7 @@ static void uli2a(unsigned long int num, unsigned int base, int uc, uint16_t* bf
     *bf = 0;
 }
 
-static void li2a(long num, uint16_t* bf)
+static void li2a(long num, wchar_t* bf)
 {
     if (num < 0)
     {
@@ -36,7 +35,7 @@ static void li2a(long num, uint16_t* bf)
     uli2a(num, 10, 0, bf);
 }
 
-static void ui2a(unsigned int num, unsigned int base, int uc, uint16_t* bf)
+static void ui2a(unsigned int num, unsigned int base, int uc, wchar_t* bf)
 {
     int n = 0;
     unsigned int d = 1;
@@ -58,7 +57,7 @@ static void ui2a(unsigned int num, unsigned int base, int uc, uint16_t* bf)
     *bf = 0;
 }
 
-static void i2a(int num, uint16_t* bf)
+static void i2a(int num, wchar_t* bf)
 {
     if (num < 0)
     {
@@ -68,7 +67,7 @@ static void i2a(int num, uint16_t* bf)
     ui2a(num, 10, 0, bf);
 }
 
-static int a2d(uint16_t ch)
+static int a2d(wchar_t ch)
 {
     if (ch >= '0' && ch <= '9')
         return ch - '0';
@@ -80,9 +79,9 @@ static int a2d(uint16_t ch)
         return -1;
 }
 
-static uint16_t a2i(uint16_t ch, uint16_t** src, int base, int* nump)
+static wchar_t a2i(wchar_t ch, wchar_t** src, int base, int* nump)
 {
-    uint16_t* p = *src;
+    wchar_t* p = *src;
     int num = 0;
     int digit;
     while ((digit = a2d(ch)) >= 0)
@@ -97,33 +96,33 @@ static uint16_t a2i(uint16_t ch, uint16_t** src, int base, int* nump)
     return ch;
 }
 
-static void putchw(void* putp, putcf putf, int n, uint16_t z, uint16_t* bf)
+static void putchw(putcf putf, int n, wchar_t z, wchar_t* bf)
 {
-    uint16_t fc = z ? '0' : ' ';
-    uint16_t ch;
-    uint16_t* p = bf;
+    wchar_t fc = z ? '0' : ' ';
+    wchar_t ch;
+    wchar_t* p = bf;
     while (*p++ && n > 0)
         n--;
     while (n-- > 0)
-        putf(putp, fc);
+        putf(fc);
     while ((ch = *bf++))
-        putf(putp, ch);
+        putf(ch);
 }
 
-static void format(void* putp, putcf putf, uint16_t* fmt, va_list va)
+static void format(putcf putf, wchar_t* fmt, va_list va)
 {
-    uint16_t bf[12];
+    wchar_t bf[12];
 
-    uint16_t ch;
+    wchar_t ch;
 
     while ((ch = *(fmt++)))
     {
         if (ch != '%')
-            putf(putp, ch);
+            putf(ch);
         else
         {
-            uint16_t lz = 0;
-            uint16_t lng = 0;
+            wchar_t lz = 0;
+            wchar_t lng = 0;
             int w = 0;
             ch = *(fmt++);
             if (ch == '0')
@@ -150,7 +149,7 @@ static void format(void* putp, putcf putf, uint16_t* fmt, va_list va)
                     uli2a(va_arg(va, unsigned long int), 10, 0, bf);
                 else
                     ui2a(va_arg(va, unsigned int), 10, 0, bf);
-                putchw(putp, putf, w, lz, bf);
+                putchw(putf, w, lz, bf);
                 break;
             }
             case 'd':
@@ -159,7 +158,7 @@ static void format(void* putp, putcf putf, uint16_t* fmt, va_list va)
                     li2a(va_arg(va, unsigned long int), bf);
                 else
                     i2a(va_arg(va, int), bf);
-                putchw(putp, putf, w, lz, bf);
+                putchw(putf, w, lz, bf);
                 break;
             }
             case 'x':
@@ -168,16 +167,16 @@ static void format(void* putp, putcf putf, uint16_t* fmt, va_list va)
                     uli2a(va_arg(va, unsigned long int), 16, (ch == 'X'), bf);
                 else
                     ui2a(va_arg(va, unsigned int), 16, (ch == 'X'), bf);
-                putchw(putp, putf, w, lz, bf);
+                putchw(putf, w, lz, bf);
                 break;
             case 'c':
-                putf(putp, (uint16_t)(va_arg(va, int)));
+                putf((wchar_t)(va_arg(va, int)));
                 break;
             case 's':
-                putchw(putp, putf, w, 0, va_arg(va, uint16_t*));
+                putchw(putf, w, 0, va_arg(va, wchar_t*));
                 break;
             case '%':
-                putf(putp, ch);
+                putf(ch);
             default:
                 break;
             }
@@ -186,30 +185,15 @@ static void format(void* putp, putcf putf, uint16_t* fmt, va_list va)
 abort:;
 }
 
-static void putcp(void* p, uint16_t c)
-{
-    *(*((uint16_t**)p))++ = c;
-}
-
-void kprintf_init(void* putp, void (*putf)(void*, uint16_t))
+void kprintf_init(void (*putf)(wchar_t))
 {
     stdout_putf = putf;
-    stdout_putp = putp;
 }
 
-void kprintf(uint16_t* fmt, ...)
+void kprintf(wchar_t* fmt, ...)
 {
     va_list va;
     va_start(va, fmt);
-    format(stdout_putp, stdout_putf, fmt, va);
-    va_end(va);
-}
-
-void ksprintf(uint16_t* s, uint16_t* fmt, ...)
-{
-    va_list va;
-    va_start(va, fmt);
-    format(&s, putcp, fmt, va);
-    putcp(&s, 0);
+    format(stdout_putf, fmt, va);
     va_end(va);
 }

@@ -1,8 +1,8 @@
-#ifndef __LOADER_H
-#define __LOADER_H
+#ifndef _LOADER_H
+#define _LOADER_H
 
 #include "uefi.h"
 
 UEFI_STATUS load_kernel();
 
-#endif
+#endif // _LOADER_H
