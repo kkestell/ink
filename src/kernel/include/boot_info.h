@@ -10,13 +10,13 @@ typedef struct pixel_bitmask {
     uint32_t  reserved;
 } pixel_bitmask;
 
-typedef enum pixel_format {
+typedef enum pixelFormat {
     PixelRedGreenBlueReserved8BitPerColor,
     PixelBlueGreenRedReserved8BitPerColor,
     PixelBitMask,
     PixelBltOnly,
     PixelFormatMax
-} pixel_format;
+} pixelFormat;
 
 typedef struct memory_map_descriptor
 {
@@ -31,19 +31,19 @@ typedef struct kernel_boot_info
 {
     // mm
     uint64_t* memory_map;
-    uint64_t memory_map_size;
-    uint64_t memory_map_key;
-    uint64_t descriptor_size;
-    uint32_t descriptor_version;
+    uint64_t memoryMapSize;
+    uint64_t memoryMapKey;
+    uint64_t descriptorSize;
+    uint32_t descriptorVersion;
 
     // fb
-    uint32_t horizontal_resolution;
-    uint32_t vertical_resolution;
-    pixel_format pixel_format;
+    uint32_t horizontalResolution;
+    uint32_t verticalResolution;
+    pixelFormat pixelFormat;
     pixel_bitmask pixel_bitmask;
-    uint32_t pixels_per_scan_line;
-    uint64_t framebuffer_base_address;
-    uint64_t framebuffer_size;
+    uint32_t pixelsPerScanLine;
+    uint64_t framebufferBaseAddress;
+    uint64_t framebufferSize;
 } kernel_boot_info;
 
 #endif // _BOOT_INFO_H

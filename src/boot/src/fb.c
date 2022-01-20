@@ -1,8 +1,7 @@
 #include "printf.h"
 #include "fb.h"
-#include "boot_info.h"
 
-UEFI_STATUS fb_init(kernel_boot_info* boot_info)
+UEFI_STATUS fb_init(KernelBootInfo* bootInfo)
 {
     UEFI_STATUS status;
     UEFI_GRAPHICS_OUTPUT_PROTOCOL* gop;
@@ -46,13 +45,13 @@ UEFI_STATUS fb_init(kernel_boot_info* boot_info)
                 kprintf(L"Error setting display resolution");
             }
 
-            boot_info->horizontal_resolution = info->HorizontalResolution;
-            boot_info->vertical_resolution = info->VerticalResolution;
-            boot_info->pixel_format = info->PixelFormat;
-            boot_info->pixel_information = info->PixelInformation;
-            boot_info->pixels_per_scan_line = info->PixelsPerScanLine;
-            boot_info->framebuffer_base_address = gop->Mode->FrameBufferBase;
-            boot_info->framebuffer_size = gop->Mode->FrameBufferSize;
+            bootInfo->horizontalResolution = info->HorizontalResolution;
+            bootInfo->verticalResolution = info->VerticalResolution;
+            bootInfo->pixelFormat = info->PixelFormat;
+            bootInfo->pixelInformation = info->PixelInformation;
+            bootInfo->pixelsPerScanLine = info->PixelsPerScanLine;
+            bootInfo->framebufferBaseAddress = gop->Mode->FrameBufferBase;
+            bootInfo->framebufferSize = gop->Mode->FrameBufferSize;
 
             return UEFI_SUCCESS;
         }

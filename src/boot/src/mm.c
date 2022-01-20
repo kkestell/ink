@@ -1,16 +1,16 @@
 #include "mm.h"
 #include "printf.h"
 
-UEFI_STATUS mm_init(UINTN* memory_map_key, kernel_boot_info* boot_info) 
+UEFI_STATUS mm_init(UINTN* memoryMapKey, KernelBootInfo* bootInfo) 
 {
     UEFI_STATUS status;
 
     status = uefi_system_table->BootServices->GetMemoryMap(
-        &boot_info->memory_map_size, 
+        &bootInfo->memoryMapSize, 
         NULL,
-        memory_map_key,
-        &boot_info->descriptor_size,
-        &boot_info->descriptor_version);
+        memoryMapKey,
+        &bootInfo->descriptorSize,
+        &bootInfo->descriptorVersion);
 
     if (UEFI_ERROR(status))
     {
@@ -22,14 +22,14 @@ UEFI_STATUS mm_init(UINTN* memory_map_key, kernel_boot_info* boot_info)
         }
     }
 
-    UINTN map_size = (boot_info->memory_map_size + 4095) / 4096;
-    boot_info->memory_map_size = map_size * 4096;
+    UINTN map_size = (bootInfo->memoryMapSize + 4095) / 4096;
+    bootInfo->memoryMapSize = map_size * 4096;
 
     status = uefi_system_table->BootServices->AllocatePages(
         AllocateAnyPages,
         UefiLoaderData,
         map_size,
-        (UEFI_PHYSICAL_ADDRESS*)boot_info->memory_map);
+        (UEFI_PHYSICAL_ADDRESS*)bootInfo->memory_map);
 
     if (UEFI_ERROR(status))
     {
@@ -38,11 +38,11 @@ UEFI_STATUS mm_init(UINTN* memory_map_key, kernel_boot_info* boot_info)
     }
 
     status = uefi_system_table->BootServices->GetMemoryMap(
-        &boot_info->memory_map_size,
-        boot_info->memory_map,
-        memory_map_key,
-        &boot_info->descriptor_size,
-        &boot_info->descriptor_version);
+        &bootInfo->memoryMapSize,
+        bootInfo->memory_map,
+        memoryMapKey,
+        &bootInfo->descriptorSize,
+        &bootInfo->descriptorVersion);
     if (UEFI_ERROR(status))
     {
         kprintf(L"Error getting system memory map %s\r\n", uefi_error_message(status));

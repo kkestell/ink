@@ -1,21 +1,22 @@
 CC = clang
 CFLAGS = -Iinclude -target x86_64-none-elf -std=c11 -ffreestanding -fomit-frame-pointer -Wall -Wextra -pedantic -Werror
+SFLAGS = -Iinclude -target x86_64-none-elf -Wall -Wextra -Werror
 
 LD = ld.lld
 LFLAGS = --script=kernel.ld 
 
-obj/%.o: src/%.S
+obj/%.o: src/%.s
 	mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(SFLAGS) -c $< -o $@
 
 obj/%.o: src/%.c
 	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 CFILES  = $(wildcard src/*.c)
-SFILES  = $(wildcard src/*.S)
+SFILES  = $(wildcard src/*.s)
 OFILES  = $(CFILES:src/%.c=obj/%.o)
-OFILES += $(SFILES:src/%.S=obj/%.o)
+OFILES += $(SFILES:src/%.s=obj/%.o)
 
 DEPS = $(OFILES:%.o=%.d)
 -include $(DEPS)
