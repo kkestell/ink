@@ -3,25 +3,25 @@
 
 #include "boot_info.h"
 
-typedef struct rgb_color
+typedef struct RgbColor
 {
     unsigned char r;
     unsigned char g;
     unsigned char b;
-} rgb_color;
+} RgbColor;
 
-typedef struct hsv_color
+typedef struct HsvColor
 {
     unsigned char h;
     unsigned char s;
     unsigned char v;
-} hsv_color;
+} HsvColor;
 
-void put_pixel(kernel_boot_info* boot_info, uint32_t x, uint32_t y, uint32_t c);
-rgb_color hsv_to_rgb(hsv_color hsv);
-hsv_color rgb_to_hsv(rgb_color rgb);
-uint32_t rgb_to_color(rgb_color rgb);
-void julia(kernel_boot_info* boot_info);
-void clear(kernel_boot_info* boot_info);
+void put_pixel(KernelBootInfo* bootInfo, uint32_t x, uint32_t y, uint32_t c);
+RgbColor hsv_to_rgb(HsvColor hsv);
+HsvColor rgb_to_hsv(RgbColor rgb);
+uint32_t rgb_to_color(RgbColor rgb);
+void julia(KernelBootInfo* bootInfo);
+void clear(KernelBootInfo* bootInfo);
 
 #endif // _FB_H

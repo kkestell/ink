@@ -3,34 +3,34 @@
 
 #include <stdint.h>
 
-typedef struct pixel_bitmask {
-    uint32_t  red;
-    uint32_t  green;
-    uint32_t  blue;
-    uint32_t  reserved;
-} pixel_bitmask;
+typedef struct PixelBitmask {
+    uint32_t red;
+    uint32_t green;
+    uint32_t blue;
+    uint32_t reserved;
+} PixelBitmask;
 
-typedef enum pixelFormat {
+typedef enum PixelFormat {
     PixelRedGreenBlueReserved8BitPerColor,
     PixelBlueGreenRedReserved8BitPerColor,
     PixelBitMask,
     PixelBltOnly,
     PixelFormatMax
-} pixelFormat;
+} PixelFormat;
 
-typedef struct memory_map_descriptor
+typedef struct MemoryMapDescriptor
 {
     uint32_t type;
-    uintptr_t physical_start;
-    uintptr_t virtual_start;
+    uintptr_t physicalStart;
+    uintptr_t virtualStart;
     uint64_t count;
     uint64_t attributes;
-} memory_map_descriptor;
+} MemoryMapDescriptor;
 
-typedef struct kernel_boot_info
+typedef struct KernelBootInfo
 {
     // mm
-    uint64_t* memory_map;
+    MemoryMapDescriptor* memoryMap;
     uint64_t memoryMapSize;
     uint64_t memoryMapKey;
     uint64_t descriptorSize;
@@ -39,11 +39,11 @@ typedef struct kernel_boot_info
     // fb
     uint32_t horizontalResolution;
     uint32_t verticalResolution;
-    pixelFormat pixelFormat;
-    pixel_bitmask pixel_bitmask;
+    PixelFormat pixelFormat;
+    PixelBitmask pixelBitmask;
     uint32_t pixelsPerScanLine;
     uint64_t framebufferBaseAddress;
     uint64_t framebufferSize;
-} kernel_boot_info;
+} KernelBootInfo;
 
 #endif // _BOOT_INFO_H

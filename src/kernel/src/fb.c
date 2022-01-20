@@ -1,13 +1,13 @@
 #include "fb.h"
 
-void put_pixel(kernel_boot_info *boot_info, uint32_t x, uint32_t y, uint32_t c)
+void put_pixel(KernelBootInfo *bootInfo, uint32_t x, uint32_t y, uint32_t c)
 {
-    *((uint32_t*)(boot_info->framebufferBaseAddress + 4 * boot_info->pixelsPerScanLine * y + 4 * x)) = c;
+    *((uint32_t*)(bootInfo->framebufferBaseAddress + 4 * bootInfo->pixelsPerScanLine * y + 4 * x)) = c;
 }
 
-rgb_color hsv_to_rgb(hsv_color hsv)
+RgbColor hsv_to_rgb(HsvColor hsv)
 {
-    rgb_color rgb;
+    RgbColor rgb;
     unsigned char region, remainder, p, q, t;
 
     if (hsv.s == 0)
@@ -51,9 +51,9 @@ rgb_color hsv_to_rgb(hsv_color hsv)
     return rgb;
 }
 
-hsv_color rgb_to_hsv(rgb_color rgb)
+HsvColor rgb_to_hsv(RgbColor rgb)
 {
-    hsv_color hsv;
+    HsvColor hsv;
     unsigned char rgbMin, rgbMax;
 
     rgbMin = rgb.r < rgb.g ? (rgb.r < rgb.b ? rgb.r : rgb.b) : (rgb.g < rgb.b ? rgb.g : rgb.b);
@@ -84,7 +84,7 @@ hsv_color rgb_to_hsv(rgb_color rgb)
     return hsv;
 }
 
-uint32_t rgb_to_color(rgb_color rgb)
+uint32_t rgb_to_color(RgbColor rgb)
 {
     uint32_t color = rgb.r;
     color = (color << 8) + rgb.g;
@@ -93,10 +93,10 @@ uint32_t rgb_to_color(rgb_color rgb)
     return color;
 }
 
-void julia(kernel_boot_info *boot_info)
+void julia(KernelBootInfo *bootInfo)
 {
-    int32_t w = boot_info->horizontalResolution;
-    int32_t h = boot_info->verticalResolution;
+    int32_t w = bootInfo->horizontalResolution;
+    int32_t h = bootInfo->verticalResolution;
     double cRe, cIm;
     double newRe, newIm, oldRe, oldIm;
     double zoom = 1, moveX = 0, moveY = 0;
@@ -124,25 +124,25 @@ void julia(kernel_boot_info *boot_info)
                     break;
             }
 
-            hsv_color c;
+            HsvColor c;
             c.h = i % 256;
             c.s = 255;
             c.v = 255 * (i < maxIterations);
 
-            put_pixel(boot_info, x, y, rgb_to_color(hsv_to_rgb(c)));
+            put_pixel(bootInfo, x, y, rgb_to_color(hsv_to_rgb(c)));
         }
     }
 }
 
-void clear(kernel_boot_info* boot_info)
+void clear(KernelBootInfo* bootInfo)
 {
     uint32_t c = 0x3b6ea5;
 
-    for (uint32_t y = 0; y < boot_info->verticalResolution; y++)
+    for (uint32_t y = 0; y < bootInfo->verticalResolution; y++)
     {
-        for (uint32_t x = 0; x < boot_info->horizontalResolution; x++)
+        for (uint32_t x = 0; x < bootInfo->horizontalResolution; x++)
         {
-            put_pixel(boot_info, x, y, c);
+            put_pixel(bootInfo, x, y, c);
         }
     }
 }

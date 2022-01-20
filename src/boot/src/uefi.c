@@ -6,15 +6,13 @@
         return L#symbol; \
         break;
 
-void* image_handle;
-
 void puts(uint16_t c)
 {
     uint16_t chars[2] = { c, '\0' };
-    uefi_system_table->ConOut->OutputString(uefi_system_table->ConOut, (uint16_t*)chars);
+    uefiSystemTable->ConOut->OutputString(uefiSystemTable->ConOut, (uint16_t *)chars);
 }
 
-const wchar_t* uefi_error_message(UEFI_STATUS const status)
+const wchar_t *uefiErrorMessage(UEFI_STATUS const status)
 {
     switch (status)
     {
@@ -53,10 +51,10 @@ const wchar_t* uefi_error_message(UEFI_STATUS const status)
     }
 }
 
-void uefi_init(void* ih, UEFI_SYSTEM_TABLE* st)
+void uefiInit(void *imageHandle, UEFI_SYSTEM_TABLE *systemTable)
 {
-    image_handle = ih;
-    uefi_system_table = st;
+    uefiImageHandle = imageHandle;
+    uefiSystemTable = systemTable;
 
     kprintf_init(puts);
 }

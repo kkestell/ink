@@ -2,7 +2,7 @@
 #include "uefi.h"
 #include "printf.h"
 
-UEFI_STATUS read_elf_identity(UEFI_FILE_PROTOCOL* const kernelImageFile, UINT8** elfIdentityBuffer)
+UEFI_STATUS read_elf_identity(UEFI_FILE_PROTOCOL * const kernelImageFile, UINT8 **elfIdentityBuffer)
 {
     UEFI_STATUS status;
 
@@ -11,28 +11,28 @@ UEFI_STATUS read_elf_identity(UEFI_FILE_PROTOCOL* const kernelImageFile, UINT8**
     status = kernelImageFile->SetPosition(kernelImageFile, 0);
     if (UEFI_ERROR(status))
     {
-        kprintf(L"Error setting file position %s\r\n", uefi_error_message(status));
+        kprintf(L"Error setting file position %s\r\n", uefiErrorMessage(status));
         return status;
     }
 
-    status = uefi_system_table->BootServices->AllocatePool(UefiLoaderData, bufferReadSize, (void**)elfIdentityBuffer);
+    status = uefiSystemTable->BootServices->AllocatePool(UefiLoaderData, bufferReadSize, (void**)elfIdentityBuffer);
     if (UEFI_ERROR(status))
     {
-        kprintf(L"Error allocating kernel identity buffer %s\r\n", uefi_error_message(status));
+        kprintf(L"Error allocating kernel identity buffer %s\r\n", uefiErrorMessage(status));
         return status;
     }
 
     status = kernelImageFile->Read(kernelImageFile, &bufferReadSize, (void *)*elfIdentityBuffer);
     if (UEFI_ERROR(status))
     {
-        kprintf(L"Error reading kernel identity %s\r\n", uefi_error_message(status));
+        kprintf(L"Error reading kernel identity %s\r\n", uefiErrorMessage(status));
         return status;
     }
 
     return UEFI_SUCCESS;
 }
 
-UEFI_STATUS validate_elf_identity(UINT8* const elfIdentityBuffer)
+UEFI_STATUS validate_elf_identity(UINT8 *const elfIdentityBuffer)
 {
     if ((elfIdentityBuffer[EI_MAG0] != 0x7F) ||
         (elfIdentityBuffer[EI_MAG1] != 0x45) ||
@@ -58,7 +58,7 @@ UEFI_STATUS validate_elf_identity(UINT8* const elfIdentityBuffer)
     return UEFI_SUCCESS;
 }
 
-UEFI_STATUS read_elf_file(UEFI_FILE_PROTOCOL* const kernelImageFile, void** kernelHeaderBuffer, void** kernelProgramHeadersBuffer)
+UEFI_STATUS read_elf_file(UEFI_FILE_PROTOCOL * const kernelImageFile, void **kernelHeaderBuffer, void **kernelProgramHeadersBuffer)
 {
     UEFI_STATUS status;
 
@@ -68,47 +68,47 @@ UEFI_STATUS read_elf_file(UEFI_FILE_PROTOCOL* const kernelImageFile, void** kern
     status = kernelImageFile->SetPosition(kernelImageFile, 0);
     if (UEFI_ERROR(status))
     {
-        kprintf(L"Unable to set file position %s\r\n", uefi_error_message(status));
+        kprintf(L"Unable to set file position %s\r\n", uefiErrorMessage(status));
         return status;
     }
 
     bufferReadSize = sizeof(Elf64_Ehdr);
 
-    status = uefi_system_table->BootServices->AllocatePool(UefiLoaderData, bufferReadSize, kernelHeaderBuffer);
+    status = uefiSystemTable->BootServices->AllocatePool(UefiLoaderData, bufferReadSize, kernelHeaderBuffer);
     if (UEFI_ERROR(status))
     {
-        kprintf(L"Unable to allocate memory for kernel image %s\r\n", uefi_error_message(status));
+        kprintf(L"Unable to allocate memory for kernel image %s\r\n", uefiErrorMessage(status));
         return status;
     }
 
     status = kernelImageFile->Read(kernelImageFile, &bufferReadSize, *kernelHeaderBuffer);
     if (UEFI_ERROR(status))
     {
-        kprintf(L"Error reading kernel image header %s\r\n", uefi_error_message(status));
+        kprintf(L"Error reading kernel image header %s\r\n", uefiErrorMessage(status));
         return status;
     }
 
-    program_headers_offset = ((Elf64_Ehdr*)*kernelHeaderBuffer)->e_phoff;
-    bufferReadSize = sizeof(Elf64_Phdr) * ((Elf64_Ehdr*)*kernelHeaderBuffer)->e_phnum;
+    program_headers_offset = ((Elf64_Ehdr *)*kernelHeaderBuffer)->e_phoff;
+    bufferReadSize = sizeof(Elf64_Phdr) * ((Elf64_Ehdr *)*kernelHeaderBuffer)->e_phnum;
 
     status = kernelImageFile->SetPosition(kernelImageFile, program_headers_offset);
     if (UEFI_ERROR(status))
     {
-        kprintf(L"Unable to set file position %s\r\n", uefi_error_message(status));
+        kprintf(L"Unable to set file position %s\r\n", uefiErrorMessage(status));
         return status;
     }
 
-    status = uefi_system_table->BootServices->AllocatePool(UefiLoaderData, bufferReadSize, kernelProgramHeadersBuffer);
+    status = uefiSystemTable->BootServices->AllocatePool(UefiLoaderData, bufferReadSize, kernelProgramHeadersBuffer);
     if (UEFI_ERROR(status))
     {
-        kprintf(L"Error allocating memory for kernel program headers %s\r\n", uefi_error_message(status));
+        kprintf(L"Error allocating memory for kernel program headers %s\r\n", uefiErrorMessage(status));
         return status;
     }
 
     status = kernelImageFile->Read(kernelImageFile, &bufferReadSize, *kernelProgramHeadersBuffer);
     if (UEFI_ERROR(status))
     {
-        kprintf(L"Error reading kernel program headers %s\r\n", uefi_error_message(status));
+        kprintf(L"Error reading kernel program headers %s\r\n", uefiErrorMessage(status));
         return status;
     }
 

@@ -59,12 +59,12 @@ typedef struct s_elf64_phdr {
     UINT64 p_align;
 } Elf64_Phdr;
 
-void print_elf_file_info(void* const header_ptr, void* const program_headers_ptr);
+void print_elf_file_info(void * const headerPtr, void * const programHeadersPtr);
 
-UEFI_STATUS read_elf_identity(UEFI_FILE_PROTOCOL* const kernel_img_file, UINT8** elf_identity_buffer);
+UEFI_STATUS read_elf_identity(UEFI_FILE_PROTOCOL * const kernelImageFile, UINT8 **elfIdentityBuffer);
 
-UEFI_STATUS read_elf_file(UEFI_FILE_PROTOCOL* const kernel_img_file, void** kernel_header_buffer, void** kernel_program_headers_buffer);
+UEFI_STATUS read_elf_file(UEFI_FILE_PROTOCOL * const kernelImageFile, void **kernelHeaderBuffer, void **kernelProgramHeadersBuffer);
 
-UEFI_STATUS validate_elf_identity(UINT8* const elf_identity_buffer);
+UEFI_STATUS validate_elf_identity(UINT8 * const elfIdentityBuffer);
 
 #endif // _ELF_H

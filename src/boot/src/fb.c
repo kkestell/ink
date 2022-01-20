@@ -1,17 +1,18 @@
-#include "printf.h"
 #include "fb.h"
+#include "printf.h"
+#include "uefi.h"
 
-UEFI_STATUS fb_init(KernelBootInfo* bootInfo)
+UEFI_STATUS fb_init(KernelBootInfo *bootInfo)
 {
     UEFI_STATUS status;
-    UEFI_GRAPHICS_OUTPUT_PROTOCOL* gop;
-    UEFI_GRAPHICS_OUTPUT_MODE_INFORMATION* info;
+    UEFI_GRAPHICS_OUTPUT_PROTOCOL *gop;
+    UEFI_GRAPHICS_OUTPUT_MODE_INFORMATION *info;
     
     UEFI_GUID guid = UEFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
-    status = uefi_system_table->BootServices->LocateProtocol(&guid, 0, (void**)&gop);
+    status = uefiSystemTable->BootServices->LocateProtocol(&guid, 0, (void **)&gop);
     if (UEFI_ERROR(status))
     {
-        kprintf(L"Error initializing UEFI_GRAPHICS_OUTPUT_PROTOCOL %s\r\n", uefi_error_message(status));
+        kprintf(L"Error initializing UEFI_GRAPHICS_OUTPUT_PROTOCOL %s\r\n", uefiErrorMessage(status));
         return status;
     }
 
@@ -23,7 +24,7 @@ UEFI_STATUS fb_init(KernelBootInfo* bootInfo)
         status = gop->SetMode(gop, 0);
         if (UEFI_ERROR(status))
         {
-            kprintf(L"Unable to determine native display resolution %s\r\n", uefi_error_message(status));
+            kprintf(L"Unable to determine native display resolution %s\r\n", uefiErrorMessage(status));
             return status;
         }
     }

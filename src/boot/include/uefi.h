@@ -5,6 +5,7 @@
 // Basic types and constants
 // ============================================================================
 
+#include <stddef.h>
 #include <stdint.h>
 
 // UEFIABI can be defined to __attribute__((ms_abi)) for example
@@ -64,44 +65,47 @@
 #define UEFI_MEMORY_RO               0x0000000000020000
 #define UEFI_MEMORY_RUNTIME          0x8000000000000000
 
-typedef uint8_t     BOOLEAN;
-typedef uint16_t    CHAR16;
-typedef void*       UEFI_EVENT;
-typedef void*       UEFI_HANDLE;
-typedef uint64_t    UEFI_LBA;
-typedef uint64_t    UEFI_PHYSICAL_ADDRESS;
-typedef uint64_t    UEFI_STATUS;
-typedef uint64_t    UEFI_TL;
-typedef uint64_t    UEFI_TPL;
-typedef uint64_t    UEFI_VIRTUAL_ADDRESS;
-typedef int8_t      INT8;
-typedef int16_t     INT16;
-typedef int32_t     INT32;
-typedef int64_t     INT64;
-typedef int64_t     INTN;
-typedef uint8_t     UINT8;
-typedef uint16_t    UINT16;
-typedef uint32_t    UINT32;
-typedef uint64_t    UINT64;
-typedef uint64_t    UINTN;
-typedef void        VOID;
+typedef uint8_t  BOOLEAN;
+typedef uint16_t CHAR16;
+typedef void     *UEFI_EVENT;
+typedef void     *UEFI_HANDLE;
+typedef uint64_t UEFI_LBA;
+typedef uint64_t UEFI_PHYSICAL_ADDRESS;
+typedef uint64_t UEFI_STATUS;
+typedef uint64_t UEFI_TL;
+typedef uint64_t UEFI_TPL;
+typedef uint64_t UEFI_VIRTUAL_ADDRESS;
+typedef int8_t   INT8;
+typedef int16_t  INT16;
+typedef int32_t  INT32;
+typedef int64_t  INT64;
+typedef int64_t  INTN;
+typedef uint8_t  UINT8;
+typedef uint16_t UINT16;
+typedef uint32_t UINT32;
+typedef uint64_t UINT64;
+typedef uint64_t UINTN;
+typedef void     VOID;
 
-typedef struct UEFI_GUID {
+typedef struct UEFI_GUID
+{
     UINT32  Data1;
     UINT16  Data2;
     UINT16  Data3;
     UINT8   Data4[8];
 } UEFI_GUID;
 
-typedef struct UEFI_MEMORY_DESCRIPTOR {
-    UINT32                  Type;
-    UEFI_PHYSICAL_ADDRESS   PhysicalStart;
-    UEFI_VIRTUAL_ADDRESS    VirtualStart;
-    UINT64                  NumberOfPages;
-    UINT64                  Attribute;
+typedef struct UEFI_MEMORY_DESCRIPTOR
+{
+    UINT32                 Type;
+    UEFI_PHYSICAL_ADDRESS  PhysicalStart;
+    UEFI_VIRTUAL_ADDRESS   VirtualStart;
+    UINT64                 NumberOfPages;
+    UINT64                 Attribute;
 } UEFI_MEMORY_DESCRIPTOR;
 
-typedef struct UEFI_TABLE_HEADER {
+typedef struct UEFI_TABLE_HEADER
+{
     UINT64  Signature;
     UINT32  Revision;
     UINT32  HeaderSize;
@@ -115,11 +119,9 @@ struct UEFI_SYSTEM_TABLE;
 // Error handling
 // ============================================================================
 
-#include <stddef.h>
-
 #define UEFI_ERROR(status) (((INTN)(UINTN)(status)) < 0)
 
-const wchar_t* uefi_error_message(UEFI_STATUS const status);
+const wchar_t* uefiErrorMessage(UEFI_STATUS const status);
 
 // ============================================================================
 // Guids
@@ -137,16 +139,16 @@ const wchar_t* uefi_error_message(UEFI_STATUS const status);
 #define UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID       {0x387477c2,  0x69c7, 0x11d2, {0x82, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}}
 #define UEFI_VGA_MINI_PORT_PROTOCOL_GUID            {0xc7735a2f,  0x88f5, 0x4882, {0xae, 0x63, 0xfa, 0xac, 0x8c, 0x8b, 0x86, 0xb3}}
 
-#define MPS_TABLE_GUID        {0xeb9d2d2f, 0x2d88, 0x11d3, {0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d}}
-#define SAL_SYSTEM_TABLE_GUID {0xeb9d2d32, 0x2d88, 0x11d3, {0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d}}
-#define SMBIOS_TABLE_GUID     {0xeb9d2d31, 0x2d88, 0x11d3, {0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d}}
-#define SMBIOS2_TABLE_GUID    {0xf2fd1544, 0x9794, 0x4a2c, {0x99, 0x2e, 0xe5, 0xbb, 0xcf, 0x20, 0xe3, 0x94}}
+#define MPS_TABLE_GUID                              {0xeb9d2d2f, 0x2d88, 0x11d3, {0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d}}
+#define SAL_SYSTEM_TABLE_GUID                       {0xeb9d2d32, 0x2d88, 0x11d3, {0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d}}
+#define SMBIOS_TABLE_GUID                           {0xeb9d2d31, 0x2d88, 0x11d3, {0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d}}
+#define SMBIOS2_TABLE_GUID                          {0xf2fd1544, 0x9794, 0x4a2c, {0x99, 0x2e, 0xe5, 0xbb, 0xcf, 0x20, 0xe3, 0x94}}
 
-#define ACPI_TABLE_GUID         {0xeb9d2d30, 0x2d88, 0x11d3, {0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d}}
-#define EFO_ACPI_10_TABLE_GUID  ACPI_TABLE_GUID
+#define ACPI_TABLE_GUID                             {0xeb9d2d30, 0x2d88, 0x11d3, {0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d}}
+#define EFO_ACPI_10_TABLE_GUID                      ACPI_TABLE_GUID
 
-#define UEFI_ACPI_TABLE_GUID    {0x8868e871, 0xe4f1, 0x11d3, {0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81}}
-#define UEFI_ACPI_20_TABLE_GUID UEFI_ACPI_TABLE_GUID
+#define UEFI_ACPI_TABLE_GUID                        {0x8868e871, 0xe4f1, 0x11d3, {0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81}}
+#define UEFI_ACPI_20_TABLE_GUID                     UEFI_ACPI_TABLE_GUID
 
 // ============================================================================
 // Macros
@@ -157,27 +159,34 @@ const wchar_t* uefi_error_message(UEFI_STATUS const status);
 
 #define UEFI_SIZE_TO_PAGES(size) (((size) >> UEFI_PAGE_SHIFT) + (((size) & UEFI_PAGE_MASK) ? 1 : 0))
 
+// ============================================================================
 // Simple Text Input Protocol
+// ============================================================================
 
-typedef struct UEFI_INPUT_KEY {
+typedef struct UEFI_INPUT_KEY
+{
     UINT16  ScanCode;
     UINT16  UnicodeChar;
 } UEFI_INPUT_KEY;
 
 struct UEFI_SIMPLE_TEXT_INPUT_PROTOCOL;
 
-typedef UEFI_STATUS (*UEFI_INPUT_RESET)(struct UEFI_SIMPLE_TEXT_INPUT_PROTOCOL* This, BOOLEAN ExtendedVerification);
-typedef UEFI_STATUS (*UEFI_INPUT_READ_KEY)(struct UEFI_SIMPLE_TEXT_INPUT_PROTOCOL* This, UEFI_INPUT_KEY* Key);
+typedef UEFI_STATUS (*UEFI_INPUT_RESET)(struct UEFI_SIMPLE_TEXT_INPUT_PROTOCOL *This, BOOLEAN ExtendedVerification);
+typedef UEFI_STATUS (*UEFI_INPUT_READ_KEY)(struct UEFI_SIMPLE_TEXT_INPUT_PROTOCOL *This, UEFI_INPUT_KEY *Key);
 
-typedef struct UEFI_SIMPLE_TEXT_INPUT_PROTOCOL {
+typedef struct UEFI_SIMPLE_TEXT_INPUT_PROTOCOL
+{
     UEFI_INPUT_RESET     Reset;
     UEFI_INPUT_READ_KEY  ReadKeyStroke;
     UEFI_EVENT           WaitForKey;
 } UEFI_SIMPLE_TEXT_INPUT_PROTOCOL;
 
+// ============================================================================
 // Simple Text Output Protocol
+// ============================================================================
 
-typedef struct SIMPLE_TEXT_OUTPUT_MODE {
+typedef struct SIMPLE_TEXT_OUTPUT_MODE
+{
     INT32   MaxMode;
     INT32   Mode;
     INT32   Attribute;
@@ -188,17 +197,18 @@ typedef struct SIMPLE_TEXT_OUTPUT_MODE {
 
 struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL;
 
-typedef UEFI_STATUS (*UEFI_TEXT_RESET)(struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* This, BOOLEAN ExtendedVerification);
-typedef UEFI_STATUS (*UEFI_TEXT_STRING)(struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* This, CHAR16* String);
-typedef UEFI_STATUS (*UEFI_TEXT_TEST_STRING)(struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* This, CHAR16* String);
-typedef UEFI_STATUS (*UEFI_TEXT_QUERY_MODE)(struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* This, UINTN ModeNumber, UINTN* Columns, UINTN* Rows);
-typedef UEFI_STATUS (*UEFI_TEXT_SET_MODE)(struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* This, UINTN ModeNumber);
-typedef UEFI_STATUS (*UEFI_TEXT_SET_ATTRIBUTE)(struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* This, UINTN Attribute);
-typedef UEFI_STATUS (*UEFI_TEXT_CLEAR_SCREEN)(struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* This);
-typedef UEFI_STATUS (*UEFI_TEXT_SET_CURSOR_POSITION)(struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* This, UINTN Column, UINTN Row);
-typedef UEFI_STATUS (*UEFI_TEXT_ENABLE_CURSOR)(struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL* This, BOOLEAN Visible);
+typedef UEFI_STATUS (*UEFI_TEXT_RESET)(struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, BOOLEAN ExtendedVerification);
+typedef UEFI_STATUS (*UEFI_TEXT_STRING)(struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, CHAR16 *String);
+typedef UEFI_STATUS (*UEFI_TEXT_TEST_STRING)(struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, CHAR16 *String);
+typedef UEFI_STATUS (*UEFI_TEXT_QUERY_MODE)(struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, UINTN ModeNumber, UINTN *Columns, UINTN *Rows);
+typedef UEFI_STATUS (*UEFI_TEXT_SET_MODE)(struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, UINTN ModeNumber);
+typedef UEFI_STATUS (*UEFI_TEXT_SET_ATTRIBUTE)(struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, UINTN Attribute);
+typedef UEFI_STATUS (*UEFI_TEXT_CLEAR_SCREEN)(struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This);
+typedef UEFI_STATUS (*UEFI_TEXT_SET_CURSOR_POSITION)(struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, UINTN Column, UINTN Row);
+typedef UEFI_STATUS (*UEFI_TEXT_ENABLE_CURSOR)(struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This, BOOLEAN Visible);
 
-typedef struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL {
+typedef struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL
+{
     UEFI_TEXT_RESET                  Reset;
     UEFI_TEXT_STRING                 OutputString;
     UEFI_TEXT_TEST_STRING            TestString;
@@ -208,17 +218,20 @@ typedef struct UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL {
     UEFI_TEXT_CLEAR_SCREEN           ClearScreen;
     UEFI_TEXT_SET_CURSOR_POSITION    SetCursorPosition;
     UEFI_TEXT_ENABLE_CURSOR          EnableCursor;
-    SIMPLE_TEXT_OUTPUT_MODE*         Mode;
+    SIMPLE_TEXT_OUTPUT_MODE         *Mode;
 } UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL;
 
+// ============================================================================
 // Time
+// ============================================================================
 
 #define UEFI_TIME_ADJUST_DAYLIGHT    0x01
 #define UEFI_TIME_IN_DAYLIGHT        0x02
 
 #define UEFI_UNSPECIFIED_TIMEZONE    0x07ff
 
-typedef struct UEFI_TIME {
+typedef struct UEFI_TIME
+{
     UINT16  Year;
     UINT8   Month;
     UINT8   Day;
@@ -232,13 +245,16 @@ typedef struct UEFI_TIME {
     UINT8   PAD2;
 } UEFI_TIME;
 
-typedef struct UEFI_TIME_CAPABILITIES {
+typedef struct UEFI_TIME_CAPABILITIES
+{
     UINT32  Resolution;
     UINT32  Accuracy;
     BOOLEAN SetsToZero;
 } UEFI_TIME_CAPABILITIES;
 
+// ============================================================================
 // Runtime Services
+// ============================================================================
 
 #define UEFI_OPTIONAL_POINTER               0x00000001
 
@@ -246,62 +262,69 @@ typedef struct UEFI_TIME_CAPABILITIES {
 #define CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE 0x00020000
 #define CAPSULE_FLAGS_INITIATE_RESET        0x00040000
 
-typedef enum UEFI_RESET_TYPE {
+typedef enum UEFI_RESET_TYPE
+{
     EfiResetCold,
     EfiResetWarm,
     EfiResetShutdown,
     EfiResetPlatformSpecific
 } UEFI_RESET_TYPE;
 
-typedef struct UEFI_CAPSULE_BLOCK_DESCRIPTOR {
-    UINT64  Length;
-    union {
+typedef struct UEFI_CAPSULE_BLOCK_DESCRIPTOR
+{
+    UINT64 Length;
+    union
+    {
         UEFI_PHYSICAL_ADDRESS    DataBlock;
         UEFI_PHYSICAL_ADDRESS    ContinuationPointer;
     } Union;
 } UEFI_CAPSULE_BLOCK_DESCRIPTOR;
 
-typedef struct UEFI_CAPSULE_HEADER {
-    UEFI_GUID    CapsuleGuid;
-    UINT32      HeaderSize;
-    UINT32      Flags;
-    UINT32      CapsuleImageSize;
+typedef struct UEFI_CAPSULE_HEADER
+{
+    UEFI_GUID CapsuleGuid;
+    UINT32    HeaderSize;
+    UINT32    Flags;
+    UINT32    CapsuleImageSize;
 } UEFI_CAPSULE_HEADER;
 
-typedef UEFI_STATUS (UEFIABI* UEFI_GET_TIME)(UEFI_TIME* Time, UEFI_TIME_CAPABILITIES *Capabilities);
-typedef UEFI_STATUS (UEFIABI* UEFI_SET_TIME)(UEFI_TIME* Time);
-typedef UEFI_STATUS (UEFIABI* UEFI_GET_WAKEUP_TIME)(BOOLEAN* Enabled, BOOLEAN* Pending, UEFI_TIME* Time);
-typedef UEFI_STATUS (UEFIABI* UEFI_SET_WAKEUP_TIME)(BOOLEAN Enable, UEFI_TIME* Time);
-typedef UEFI_STATUS (UEFIABI* UEFI_SET_VIRTUAL_ADDRESS_MAP)(UINTN MemoryMapSize, UINTN DescriptorSize, UINT32 DescriptorVersion, UEFI_MEMORY_DESCRIPTOR* VirtualMap);
-typedef UEFI_STATUS (UEFIABI* UEFI_CONVERT_POINTER)(UINTN DebugDisposition, VOID** Address);
-typedef UEFI_STATUS (UEFIABI* UEFI_GET_VARIABLE)(CHAR16* VariableName, UEFI_GUID* VendorGuid, UINT32* Attributes, UINTN* DataSize, VOID* Data);
-typedef UEFI_STATUS (UEFIABI* UEFI_GET_NEXT_VARIABLE_NAME)(UINTN* VariableNameSize, CHAR16* VariableName, UEFI_GUID* VendorGuid);
-typedef UEFI_STATUS (UEFIABI* UEFI_SET_VARIABLE)(CHAR16* VariableName, UEFI_GUID* VendorGuid, UINT32 Attributes, UINTN DataSize, VOID* Data);
-typedef UEFI_STATUS (UEFIABI* UEFI_GET_NEXT_HIGH_MONO_COUNT)(UINT32* HighCount);
-typedef UEFI_STATUS (UEFIABI* UEFI_RESET_SYSTEM)(UEFI_RESET_TYPE ResetType, UEFI_STATUS ResetStatus, UINTN DataSize, VOID* ResetData);
-typedef UEFI_STATUS (UEFIABI* UEFI_UPDATE_CAPSULE)(UEFI_CAPSULE_HEADER** CapsuleHeaderArray, UINTN CapsuleCount, UEFI_PHYSICAL_ADDRESS ScatterGatherList);
-typedef UEFI_STATUS (UEFIABI* UEFI_QUERY_CAPSULE_CAPABILITIES)(UEFI_CAPSULE_HEADER** CapsuleHeaderArray, UINTN CapsuleCount, UINT64* MaximumCapsuleSize, UEFI_RESET_TYPE* ResetType);
-typedef UEFI_STATUS (UEFIABI* UEFI_QUERY_VARIABLE_INFO)(UINT32 Attributes, UINT64* MaximumVariableStorageSize, UINT64* RemainingVariableStorageSize, UINT64* MaximumVariableSize);
+typedef UEFI_STATUS (UEFIABI *UEFI_GET_TIME)(UEFI_TIME *Time, UEFI_TIME_CAPABILITIES *Capabilities);
+typedef UEFI_STATUS (UEFIABI *UEFI_SET_TIME)(UEFI_TIME *Time);
+typedef UEFI_STATUS (UEFIABI *UEFI_GET_WAKEUP_TIME)(BOOLEAN *Enabled, BOOLEAN *Pending, UEFI_TIME *Time);
+typedef UEFI_STATUS (UEFIABI *UEFI_SET_WAKEUP_TIME)(BOOLEAN Enable, UEFI_TIME *Time);
+typedef UEFI_STATUS (UEFIABI *UEFI_SET_VIRTUAL_ADDRESS_MAP)(UINTN MemoryMapSize, UINTN DescriptorSize, UINT32 DescriptorVersion, UEFI_MEMORY_DESCRIPTOR *VirtualMap);
+typedef UEFI_STATUS (UEFIABI *UEFI_CONVERT_POINTER)(UINTN DebugDisposition, VOID **Address);
+typedef UEFI_STATUS (UEFIABI *UEFI_GET_VARIABLE)(CHAR16 *VariableName, UEFI_GUID *VendorGuid, UINT32 *Attributes, UINTN *DataSize, VOID *Data);
+typedef UEFI_STATUS (UEFIABI *UEFI_GET_NEXT_VARIABLE_NAME)(UINTN *VariableNameSize, CHAR16 *VariableName, UEFI_GUID *VendorGuid);
+typedef UEFI_STATUS (UEFIABI *UEFI_SET_VARIABLE)(CHAR16 *VariableName, UEFI_GUID *VendorGuid, UINT32 Attributes, UINTN DataSize, VOID *Data);
+typedef UEFI_STATUS (UEFIABI *UEFI_GET_NEXT_HIGH_MONO_COUNT)(UINT32 *HighCount);
+typedef UEFI_STATUS (UEFIABI *UEFI_RESET_SYSTEM)(UEFI_RESET_TYPE ResetType, UEFI_STATUS ResetStatus, UINTN DataSize, VOID *ResetData);
+typedef UEFI_STATUS (UEFIABI *UEFI_UPDATE_CAPSULE)(UEFI_CAPSULE_HEADER **CapsuleHeaderArray, UINTN CapsuleCount, UEFI_PHYSICAL_ADDRESS ScatterGatherList);
+typedef UEFI_STATUS (UEFIABI *UEFI_QUERY_CAPSULE_CAPABILITIES)(UEFI_CAPSULE_HEADER **CapsuleHeaderArray, UINTN CapsuleCount, UINT64 *MaximumCapsuleSize, UEFI_RESET_TYPE *ResetType);
+typedef UEFI_STATUS (UEFIABI *UEFI_QUERY_VARIABLE_INFO)(UINT32 Attributes, UINT64 *MaximumVariableStorageSize, UINT64 *RemainingVariableStorageSize, UINT64 *MaximumVariableSize);
 
-typedef struct UEFI_RUNTIME_SERVICES {
-    UEFI_TABLE_HEADER                Hdr;
-    UEFI_GET_TIME                    GetTime;
-    UEFI_SET_TIME                    SetTime;
-    UEFI_GET_WAKEUP_TIME             GetWakeupTime;
-    UEFI_SET_WAKEUP_TIME             SetWakeupTime;
-    UEFI_SET_VIRTUAL_ADDRESS_MAP     SetVirtualAddressMap;
-    UEFI_CONVERT_POINTER             ConvertPointer;
-    UEFI_GET_VARIABLE                GetVariable;
-    UEFI_GET_NEXT_VARIABLE_NAME      GetNextVariableName;
-    UEFI_SET_VARIABLE                SetVariable;
-    UEFI_GET_NEXT_HIGH_MONO_COUNT    GetNextHighMonotonicCount;
-    UEFI_RESET_SYSTEM                ResetSystem;
-    UEFI_UPDATE_CAPSULE              UpdateCapsule;
-    UEFI_QUERY_CAPSULE_CAPABILITIES  QueryCapsuleCapabilities;
-    UEFI_QUERY_VARIABLE_INFO         QueryVariableInfo;
+typedef struct UEFI_RUNTIME_SERVICES
+{
+    UEFI_TABLE_HEADER               Hdr;
+    UEFI_GET_TIME                   GetTime;
+    UEFI_SET_TIME                   SetTime;
+    UEFI_GET_WAKEUP_TIME            GetWakeupTime;
+    UEFI_SET_WAKEUP_TIME            SetWakeupTime;
+    UEFI_SET_VIRTUAL_ADDRESS_MAP    SetVirtualAddressMap;
+    UEFI_CONVERT_POINTER            ConvertPointer;
+    UEFI_GET_VARIABLE               GetVariable;
+    UEFI_GET_NEXT_VARIABLE_NAME     GetNextVariableName;
+    UEFI_SET_VARIABLE               SetVariable;
+    UEFI_GET_NEXT_HIGH_MONO_COUNT   GetNextHighMonotonicCount;
+    UEFI_RESET_SYSTEM               ResetSystem;
+    UEFI_UPDATE_CAPSULE             UpdateCapsule;
+    UEFI_QUERY_CAPSULE_CAPABILITIES QueryCapsuleCapabilities;
+    UEFI_QUERY_VARIABLE_INFO        QueryVariableInfo;
 } UEFI_RUNTIME_SERVICES;
 
+// ============================================================================
 // Device Path Protocol
+// ============================================================================
 
 #define UEFI_HARDWARE_DEVICE_PATH                0x01
 #define UEFI_ACPI_DEVICE_PATH                    0x02
@@ -310,78 +333,86 @@ typedef struct UEFI_RUNTIME_SERVICES {
 #define UEFI_BIOS_BOOT_SPECIFICATION_DEVICE_PATH 0x05
 #define UEFI_END_OF_HARDWARE_DEVICE_PATH         0x7f
 
-typedef struct UEFI_DEVICE_PATH_PROTOCOL {
-    UINT8   Type;
-    UINT8   SubType;
-    UINT8   Length[2];
+typedef struct UEFI_DEVICE_PATH_PROTOCOL
+{
+    UINT8 Type;
+    UINT8 SubType;
+    UINT8 Length[2];
 } UEFI_DEVICE_PATH_PROTOCOL;
 
+// ============================================================================
 // Boot Services
+// ============================================================================
 
-#define EVT_TIMER                               0x80000000
-#define EVT_RUNTIME                             0x40000000
-#define EVT_NOTIFY_WAIT                         0x00000100
-#define EVT_NOTIFY_SIGNAL                       0x00000200
-#define EVT_SIGNAL_EXIT_BOOT_SERVICES           0x00000201
-#define EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE       0x00000202
+#define EVT_TIMER                                0x80000000
+#define EVT_RUNTIME                              0x40000000
+#define EVT_NOTIFY_WAIT                          0x00000100
+#define EVT_NOTIFY_SIGNAL                        0x00000200
+#define EVT_SIGNAL_EXIT_BOOT_SERVICES            0x00000201
+#define EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE        0x00000202
 
-#define TPL_APPLICATION                         4
-#define TPL_CALLBACK                            8
-#define TPL_NOTIFY                              16
-#define TPL_HIGH_LEVEL                          31
+#define TPL_APPLICATION                          4
+#define TPL_CALLBACK                             8
+#define TPL_NOTIFY                               16
+#define TPL_HIGH_LEVEL                           31
 
-#define UEFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL   0x00000001
-#define UEFI_OPEN_PROTOCOL_GET_PROTOCOL         0x00000002
-#define UEFI_OPEN_PROTOCOL_TEST_PROTOCOL        0x00000004
-#define UEFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER  0x00000008
-#define UEFI_OPEN_PROTOCOL_BY_DRIVER            0x00000010
-#define UEFI_OPEN_PROTOCOL_EXCLUSIVE            0x00000020
+#define UEFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL    0x00000001
+#define UEFI_OPEN_PROTOCOL_GET_PROTOCOL          0x00000002
+#define UEFI_OPEN_PROTOCOL_TEST_PROTOCOL         0x00000004
+#define UEFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER   0x00000008
+#define UEFI_OPEN_PROTOCOL_BY_DRIVER             0x00000010
+#define UEFI_OPEN_PROTOCOL_EXCLUSIVE             0x00000020
 
-#define UefiReservedMemoryType       0x00000000
+#define UefiReservedMemoryType                   0x00000000
 
-#define UefiLoaderCode               0x00000001
-#define UefiLoaderData               0x00000002
+#define UefiLoaderCode                           0x00000001
+#define UefiLoaderData                           0x00000002
 
-#define UefiBootServicesCode         0x00000003
-#define UefiBootServicesData         0x00000004
-#define UefiRuntimeServicesCode      0x00000005
-#define UefiRuntimeServicesData      0x00000006
-#define UefiConventionalMemory       0x00000007
-#define UefiUnusableMemory           0x00000008
-#define UefiACPIReclaimMemory        0x00000009
-#define UefiACPIMemoryNVS            0x0000000a
-#define UefiMemoryMappedIO           0x0000000b
-#define UefiMemoryMappedIOPortSpace  0x0000000c
-#define UefiPalCode                  0x0000000d
-#define UefiPersistentMemory         0x0000000e
-#define UefiMaxMemoryType            0x0000000e
+#define UefiBootServicesCode                     0x00000003
+#define UefiBootServicesData                     0x00000004
+#define UefiRuntimeServicesCode                  0x00000005
+#define UefiRuntimeServicesData                  0x00000006
+#define UefiConventionalMemory                   0x00000007
+#define UefiUnusableMemory                       0x00000008
+#define UefiACPIReclaimMemory                    0x00000009
+#define UefiACPIMemoryNVS                        0x0000000a
+#define UefiMemoryMappedIO                       0x0000000b
+#define UefiMemoryMappedIOPortSpace              0x0000000c
+#define UefiPalCode                              0x0000000d
+#define UefiPersistentMemory                     0x0000000e
+#define UefiMaxMemoryType                        0x0000000e
 
-typedef VOID (*UEFI_EVENT_NOTIFY)(UEFI_EVENT Event, VOID* Context);
+typedef VOID (*UEFI_EVENT_NOTIFY)(UEFI_EVENT Event, VOID *Context);
 
-typedef enum UEFI_TIMER_DELAY {
+typedef enum UEFI_TIMER_DELAY
+{
     TimerCancel,
     TimerPeriodic,
     TimerRelative
 } UEFI_TIMER_DELAY;
 
-typedef enum UEFI_ALLOCATE_TYPE {
+typedef enum UEFI_ALLOCATE_TYPE
+{
     AllocateAnyPages,
     AllocateMaxAddress,
     AllocateAddress,
     MaxAllocateType
 } UEFI_ALLOCATE_TYPE;
 
-typedef enum UEFI_INTERFACE_TYPE {
+typedef enum UEFI_INTERFACE_TYPE
+{
     UEFI_NATIVE_INTERFACE
 } UEFI_INTERFACE_TYPE;
 
-typedef enum UEFI_LOCATE_SEARCH_TYPE {
+typedef enum UEFI_LOCATE_SEARCH_TYPE
+{
     AllHandles,
     ByRegisterNotify,
     ByProtocol
 } UEFI_LOCATE_SEARCH_TYPE;
 
-typedef struct UEFI_OPEN_PROTOCOL_INFORMATION_ENTRY {
+typedef struct UEFI_OPEN_PROTOCOL_INFORMATION_ENTRY
+{
     UEFI_HANDLE  AgentHandle;
     UEFI_HANDLE  ControllerHandle;
     UINT32      Attributes;
@@ -390,49 +421,50 @@ typedef struct UEFI_OPEN_PROTOCOL_INFORMATION_ENTRY {
 
 typedef UEFI_STATUS (*UEFI_RAISE_TPL)(UEFI_TPL NewTpl);
 typedef UEFI_STATUS (*UEFI_RESTORE_TPL)(UEFI_TPL OldTpl);
-typedef UEFI_STATUS (*UEFI_ALLOCATE_PAGES)(UEFI_ALLOCATE_TYPE Type, UINTN MemoryType, UINTN Pages, UEFI_PHYSICAL_ADDRESS* Memory);
+typedef UEFI_STATUS (*UEFI_ALLOCATE_PAGES)(UEFI_ALLOCATE_TYPE Type, UINTN MemoryType, UINTN Pages, UEFI_PHYSICAL_ADDRESS *Memory);
 typedef UEFI_STATUS (*UEFI_FREE_PAGES)(UEFI_PHYSICAL_ADDRESS Memory, UINTN Pages);
-typedef UEFI_STATUS (*UEFI_GET_MEMORY_MAP)(UINTN* MemoryMapSize, UEFI_MEMORY_DESCRIPTOR* MemoryMap, UINTN* MapKey, UINTN* DescriptorSize, UINT32* DescriptorVersion);
-typedef UEFI_STATUS (*UEFI_ALLOCATE_POOL)(UINTN PoolType, UINTN Size, VOID** Buffer);
-typedef UEFI_STATUS (*UEFI_FREE_POOL)(VOID* Buffer);
-typedef UEFI_STATUS (*UEFI_CREATE_EVENT)(UINT32 Type, UEFI_TPL NotifyTpl, UEFI_EVENT_NOTIFY NotifyFunction, VOID* NotifyContext, UEFI_GUID* EventGroup, UEFI_EVENT* Event);
+typedef UEFI_STATUS (*UEFI_GET_MEMORY_MAP)(UINTN *MemoryMapSize, UEFI_MEMORY_DESCRIPTOR *MemoryMap, UINTN *MapKey, UINTN *DescriptorSize, UINT32 *DescriptorVersion);
+typedef UEFI_STATUS (*UEFI_ALLOCATE_POOL)(UINTN PoolType, UINTN Size, VOID **Buffer);
+typedef UEFI_STATUS (*UEFI_FREE_POOL)(VOID *Buffer);
+typedef UEFI_STATUS (*UEFI_CREATE_EVENT)(UINT32 Type, UEFI_TPL NotifyTpl, UEFI_EVENT_NOTIFY NotifyFunction, VOID *NotifyContext, UEFI_GUID *EventGroup, UEFI_EVENT *Event);
 typedef UEFI_STATUS (*UEFI_SET_TIMER)(UEFI_EVENT Event, UEFI_TIMER_DELAY Type, UINT64 TriggerTime);
-typedef UEFI_STATUS (*UEFI_WAIT_FOR_EVENT)(UINTN NumberOfEvents, UEFI_EVENT* Event, UINTN* Index);
+typedef UEFI_STATUS (*UEFI_WAIT_FOR_EVENT)(UINTN NumberOfEvents, UEFI_EVENT *Event, UINTN *Index);
 typedef UEFI_STATUS (*UEFI_SIGNAL_EVENT)(UEFI_EVENT Event);
 typedef UEFI_STATUS (*UEFI_CLOSE_EVENT)(UEFI_EVENT Event);
 typedef UEFI_STATUS (*UEFI_CHECK_EVENT)(UEFI_EVENT Event);
-typedef UEFI_STATUS (*UEFI_INSTALL_PROTOCOL_INTERFACE)(UEFI_HANDLE* Handle, UEFI_GUID* Protocol, UEFI_INTERFACE_TYPE InterfaceType, VOID* Interface);
-typedef UEFI_STATUS (*UEFI_REINSTALL_PROTOCOL_INTERFACE)(UEFI_HANDLE Handle, UEFI_GUID* Protocol, VOID* OldInterface, VOID* NewInterface);
-typedef UEFI_STATUS (*UEFI_UNINSTALL_PROTOCOL_INTERFACE)(UEFI_HANDLE Handle, UEFI_GUID* Protocol, VOID* Interface);
-typedef UEFI_STATUS (*UEFI_HANDLE_PROTOCOL)(UEFI_HANDLE Handle, UEFI_GUID* Protocol, VOID** Interface);
-typedef UEFI_STATUS (*UEFI_REGISTER_PROTOCOL_NOTIFY)(UEFI_GUID* Protocol, UEFI_EVENT Event, VOID** Registration);
-typedef UEFI_STATUS (*UEFI_LOCATE_HANDLE)(UEFI_LOCATE_SEARCH_TYPE SearchType, UEFI_GUID* Protocol, VOID* SearchKey, UINTN* BufferSize, UEFI_HANDLE* Buffer);
-typedef UEFI_STATUS (*UEFI_LOCATE_DEVICE_PATH)(UEFI_GUID* Protocol, UEFI_DEVICE_PATH_PROTOCOL** DevicePath, UEFI_HANDLE* Device);
-typedef UEFI_STATUS (*UEFI_INSTALL_CONFIGURATION_TABLE)(UEFI_GUID* Guid, VOID* Table);
-typedef UEFI_STATUS (*UEFI_IMAGE_LOAD)(BOOLEAN BootPolicy, UEFI_HANDLE ParentImageHandle, UEFI_DEVICE_PATH_PROTOCOL* DevicePath, VOID* SourceBuffer, UINTN SourceSize, UEFI_HANDLE* ImageHandle);
-typedef UEFI_STATUS (*UEFI_IMAGE_START)(UEFI_HANDLE ImageHandle, UINTN* ExitDataSize, CHAR16** ExitData);
-typedef UEFI_STATUS (*UEFI_EXIT)(UEFI_HANDLE ImageHandle, UEFI_STATUS ExitStatus, UINTN ExitDataSize, CHAR16* ExitData);
+typedef UEFI_STATUS (*UEFI_INSTALL_PROTOCOL_INTERFACE)(UEFI_HANDLE *Handle, UEFI_GUID *Protocol, UEFI_INTERFACE_TYPE InterfaceType, VOID *Interface);
+typedef UEFI_STATUS (*UEFI_REINSTALL_PROTOCOL_INTERFACE)(UEFI_HANDLE Handle, UEFI_GUID *Protocol, VOID *OldInterface, VOID *NewInterface);
+typedef UEFI_STATUS (*UEFI_UNINSTALL_PROTOCOL_INTERFACE)(UEFI_HANDLE Handle, UEFI_GUID *Protocol, VOID *Interface);
+typedef UEFI_STATUS (*UEFI_HANDLE_PROTOCOL)(UEFI_HANDLE Handle, UEFI_GUID *Protocol, VOID **Interface);
+typedef UEFI_STATUS (*UEFI_REGISTER_PROTOCOL_NOTIFY)(UEFI_GUID *Protocol, UEFI_EVENT Event, VOID **Registration);
+typedef UEFI_STATUS (*UEFI_LOCATE_HANDLE)(UEFI_LOCATE_SEARCH_TYPE SearchType, UEFI_GUID *Protocol, VOID *SearchKey, UINTN *BufferSize, UEFI_HANDLE *Buffer);
+typedef UEFI_STATUS (*UEFI_LOCATE_DEVICE_PATH)(UEFI_GUID *Protocol, UEFI_DEVICE_PATH_PROTOCOL **DevicePath, UEFI_HANDLE *Device);
+typedef UEFI_STATUS (*UEFI_INSTALL_CONFIGURATION_TABLE)(UEFI_GUID *Guid, VOID *Table);
+typedef UEFI_STATUS (*UEFI_IMAGE_LOAD)(BOOLEAN BootPolicy, UEFI_HANDLE ParentImageHandle, UEFI_DEVICE_PATH_PROTOCOL *DevicePath, VOID *SourceBuffer, UINTN SourceSize, UEFI_HANDLE *ImageHandle);
+typedef UEFI_STATUS (*UEFI_IMAGE_START)(UEFI_HANDLE ImageHandle, UINTN *ExitDataSize, CHAR16 **ExitData);
+typedef UEFI_STATUS (*UEFI_EXIT)(UEFI_HANDLE ImageHandle, UEFI_STATUS ExitStatus, UINTN ExitDataSize, CHAR16 *ExitData);
 typedef UEFI_STATUS (*UEFI_IMAGE_UNLOAD)(UEFI_HANDLE ImageHandle);
 typedef UEFI_STATUS (*UEFI_EXIT_BOOT_SERVICES)(UEFI_HANDLE ImageHandle, UINTN MapKey);
-typedef UEFI_STATUS (*UEFI_GET_NEXT_MONOTONIC_COUNT)(UINT64* Count);
+typedef UEFI_STATUS (*UEFI_GET_NEXT_MONOTONIC_COUNT)(UINT64 *Count);
 typedef UEFI_STATUS (*UEFI_STALL)(UINTN Microseconds);
-typedef UEFI_STATUS (*UEFI_SET_WATCHDOG_TIMER)(UINTN Timeout, UINT64 WatchdogCode, UINTN DataSize, CHAR16* WatchdogData);
-typedef UEFI_STATUS (*UEFI_CONNECT_CONTROLLER)(UEFI_HANDLE ControllerHandle, UEFI_HANDLE *DriverImageHandle, UEFI_DEVICE_PATH_PROTOCOL* RemainingDevicePath, BOOLEAN Recursive);
+typedef UEFI_STATUS (*UEFI_SET_WATCHDOG_TIMER)(UINTN Timeout, UINT64 WatchdogCode, UINTN DataSize, CHAR16 *WatchdogData);
+typedef UEFI_STATUS (*UEFI_CONNECT_CONTROLLER)(UEFI_HANDLE ControllerHandle, UEFI_HANDLE *DriverImageHandle, UEFI_DEVICE_PATH_PROTOCOL *RemainingDevicePath, BOOLEAN Recursive);
 typedef UEFI_STATUS (*UEFI_DISCONNECT_CONTROLLER)(UEFI_HANDLE ControllerHandle, UEFI_HANDLE DriverImageHandle, UEFI_HANDLE ChildHandle);
-typedef UEFI_STATUS (*UEFI_OPEN_PROTOCOL)(UEFI_HANDLE Handle, UEFI_GUID* Protocol, VOID** Interface, UEFI_HANDLE AgentHandle, UEFI_HANDLE ControllerHandle, UINT32 Attributes);
-typedef UEFI_STATUS (*UEFI_CLOSE_PROTOCOL)(UEFI_HANDLE Handle, UEFI_GUID* Protocol, UEFI_HANDLE AgentHandle, UEFI_HANDLE ControllerHandle);
+typedef UEFI_STATUS (*UEFI_OPEN_PROTOCOL)(UEFI_HANDLE Handle, UEFI_GUID *Protocol, void **Interface, UEFI_HANDLE AgentHandle, UEFI_HANDLE ControllerHandle, UINT32 Attributes);
+typedef UEFI_STATUS (*UEFI_CLOSE_PROTOCOL)(UEFI_HANDLE Handle, UEFI_GUID *Protocol, UEFI_HANDLE AgentHandle, UEFI_HANDLE ControllerHandle);
 typedef UEFI_STATUS (*UEFI_OPEN_PROTOCOL_INFORMATION)(UEFI_HANDLE Handle, UEFI_GUID *Protocol, UEFI_OPEN_PROTOCOL_INFORMATION_ENTRY **EntryBuffer, UINTN *EntryCount);
-typedef UEFI_STATUS (*UEFI_PROTOCOLS_PER_HANDLE)(UEFI_HANDLE Handle, UEFI_GUID*** ProtocolBuffer, UINTN* ProtocolBufferCount);
-typedef UEFI_STATUS (*UEFI_LOCATE_HANDLE_BUFFER)(UEFI_LOCATE_SEARCH_TYPE SearchType, UEFI_GUID* Protocol, VOID* SearchKey, UINTN* NoHandles, UEFI_HANDLE** Buffer);
-typedef UEFI_STATUS (*UEFI_LOCATE_PROTOCOL)(UEFI_GUID* Protocol, VOID* Registration, VOID** Interface);
-typedef UEFI_STATUS (*UEFI_INSTALL_MULTIPLE_PROTOCOL_INTERFACES)(UEFI_HANDLE* Handle, ...);
-typedef UEFI_STATUS (*UEFI_UNINSTALL_MULTIPLE_PROTOCOL_INTERFACES)(UEFI_HANDLE* Handle, ...);
-typedef UEFI_STATUS (*UEFI_CALCULATE_CRC32)(VOID* Data, UINTN DataSize, UINT32* Crc32);
-typedef UEFI_STATUS (*UEFI_COPY_MEM)(VOID* Destination, VOID* Source, UINTN Length);
-typedef UEFI_STATUS (*UEFI_SET_MEM)(VOID* Buffer, UINTN Size, UINT8 Value);
-typedef UEFI_STATUS (*UEFI_CREATE_EVENT_EX)(UINT32 Type, UEFI_TPL NotifyTpl, UEFI_EVENT_NOTIFY NotifyFunction, VOID* NotifyContext, UEFI_GUID* EventGroup, UEFI_EVENT* Event);
+typedef UEFI_STATUS (*UEFI_PROTOCOLS_PER_HANDLE)(UEFI_HANDLE Handle, UEFI_GUID ***ProtocolBuffer, UINTN *ProtocolBufferCount);
+typedef UEFI_STATUS (*UEFI_LOCATE_HANDLE_BUFFER)(UEFI_LOCATE_SEARCH_TYPE SearchType, UEFI_GUID *Protocol, VOID *SearchKey, UINTN *NoHandles, UEFI_HANDLE **Buffer);
+typedef UEFI_STATUS (*UEFI_LOCATE_PROTOCOL)(UEFI_GUID *Protocol, VOID *Registration, VOID **Interface);
+typedef UEFI_STATUS (*UEFI_INSTALL_MULTIPLE_PROTOCOL_INTERFACES)(UEFI_HANDLE *Handle, ...);
+typedef UEFI_STATUS (*UEFI_UNINSTALL_MULTIPLE_PROTOCOL_INTERFACES)(UEFI_HANDLE *Handle, ...);
+typedef UEFI_STATUS (*UEFI_CALCULATE_CRC32)(VOID *Data, UINTN DataSize, UINT32 *Crc32);
+typedef UEFI_STATUS (*UEFI_COPY_MEM)(VOID *Destination, VOID *Source, UINTN Length);
+typedef UEFI_STATUS (*UEFI_SET_MEM)(VOID *Buffer, UINTN Size, UINT8 Value);
+typedef UEFI_STATUS (*UEFI_CREATE_EVENT_EX)(UINT32 Type, UEFI_TPL NotifyTpl, UEFI_EVENT_NOTIFY NotifyFunction, VOID *NotifyContext, UEFI_GUID *EventGroup, UEFI_EVENT *Event);
 
-typedef struct UEFI_BOOT_SERVICES {
+typedef struct UEFI_BOOT_SERVICES
+{
     UEFI_TABLE_HEADER                            Hdr;
     UEFI_RAISE_TPL                               RaiseTPL;
     UEFI_RESTORE_TPL                             RestoreTPL;
@@ -451,7 +483,7 @@ typedef struct UEFI_BOOT_SERVICES {
     UEFI_REINSTALL_PROTOCOL_INTERFACE            ReinstallProtocolInterface;
     UEFI_UNINSTALL_PROTOCOL_INTERFACE            UninstallProtocolInterface;
     UEFI_HANDLE_PROTOCOL                         HandleProtocol;
-    VOID*                                        Reserved;
+    VOID                                        *Reserved;
     UEFI_REGISTER_PROTOCOL_NOTIFY                RegisterProtocolNotify;
     UEFI_LOCATE_HANDLE                           LocateHandle;
     UEFI_LOCATE_DEVICE_PATH                      LocateDevicePath;
@@ -480,26 +512,34 @@ typedef struct UEFI_BOOT_SERVICES {
     UEFI_CREATE_EVENT_EX                         CreateEventEx;
 } UEFI_BOOT_SERVICES;
 
+// ============================================================================
 // Configuration Table
+// ============================================================================
 
-typedef struct UEFI_CONFIGURATION_TABLE {
+typedef struct UEFI_CONFIGURATION_TABLE
+{
     UEFI_GUID    VendorGuid;
-    VOID*        VendorTable;
+    VOID        *VendorTable;
 } UEFI_CONFIGURATION_TABLE;
 
+// ============================================================================
 // ACPI Table Protocol
+// ============================================================================
 
 struct UEFI_ACPI_TABLE_PROTOCOL;
 
-typedef UEFI_STATUS (*UEFI_ACPI_TABLE_INSTALL_ACPI_TABLE)(struct UEFI_ACPI_TABLE_PROTOCOL* This, VOID* AcpiTableBuffer, UINTN AcpiTableBufferSize, UINTN* TableKey);
-typedef UEFI_STATUS (*UEFI_ACPI_TABLE_UNINSTALL_ACPI_TABLE)(struct UEFI_ACPI_TABLE_PROTOCOL* This, UINTN TableKey);
+typedef UEFI_STATUS (*UEFI_ACPI_TABLE_INSTALL_ACPI_TABLE)(struct UEFI_ACPI_TABLE_PROTOCOL *This, VOID *AcpiTableBuffer, UINTN AcpiTableBufferSize, UINTN *TableKey);
+typedef UEFI_STATUS (*UEFI_ACPI_TABLE_UNINSTALL_ACPI_TABLE)(struct UEFI_ACPI_TABLE_PROTOCOL *This, UINTN  TableKey);
 
-typedef struct UEFI_ACPI_TABLE_PROTOCOL {
+typedef struct UEFI_ACPI_TABLE_PROTOCOL
+{
     UEFI_ACPI_TABLE_INSTALL_ACPI_TABLE   InstallAcpiTable;
     UEFI_ACPI_TABLE_UNINSTALL_ACPI_TABLE UninstallAcpiTable;
 } UEFI_ACPI_TABLE_PROTOCOL;
 
+// ============================================================================
 // File Protocol
+// ============================================================================
 
 #define UEFI_FILE_INFO_ID                {0x09576e92, 0x6d3f, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}}
 #define UEFI_FILE_SYSTEM_INFO_ID         {0x09576e93, 0x6d3f, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}} 
@@ -521,18 +561,20 @@ typedef struct UEFI_ACPI_TABLE_PROTOCOL {
 #define UEFI_FILE_ARCHIVE    0x0000000000000020
 #define UEFI_FILE_VALID_ATTR 0x0000000000000037
 
-typedef struct UEFI_FILE_INFO {
+typedef struct UEFI_FILE_INFO
+{
     UINT64      Size;
     UINT64      FileSize;
     UINT64      PhysicalSize;
-    UEFI_TIME   CreateTime;
-    UEFI_TIME   LastAccessTime;
-    UEFI_TIME   ModificationTime;
+    UEFI_TIME    CreateTime;
+    UEFI_TIME    LastAccessTime;
+    UEFI_TIME    ModificationTime;
     UINT64      Attribute;
-    CHAR16*     FileName;
+    CHAR16      *FileName;
 } UEFI_FILE_INFO;
 
-typedef struct UEFI_FILE_SYSTEM_INFO {
+typedef struct UEFI_FILE_SYSTEM_INFO
+{
     UINT64  Size;
     BOOLEAN ReadOnly;
     UINT64  VolumeSize;
@@ -541,62 +583,69 @@ typedef struct UEFI_FILE_SYSTEM_INFO {
     CHAR16  VolumeLabel;
 } UEFI_FILE_SYSTEM_INFO;
 
-typedef struct UEFI_FILE_SYSTEM_VOLUME_LABEL {
-    CHAR16* VolumeLabel;
+typedef struct UEFI_FILE_SYSTEM_VOLUME_LABEL
+{
+    CHAR16 *VolumeLabel;
 } UEFI_FILE_SYSTEM_VOLUME_LABEL;
 
-typedef struct UEFI_FILE_IO_TOKEN {
+typedef struct UEFI_FILE_IO_TOKEN
+{
     UEFI_EVENT   Event;
     UEFI_STATUS  Status;
-    UINTN        BufferSize;
-    VOID*        Buffer;
+    UINTN       BufferSize;
+    VOID        *Buffer;
 } UEFI_FILE_IO_TOKEN;
 
 struct UEFI_FILE_PROTOCOL;
 
-typedef UEFI_STATUS (*UEFI_FILE_OPEN)(struct UEFI_FILE_PROTOCOL* This, struct UEFI_FILE_PROTOCOL** NewHandle, CHAR16* FileName, UINT64 OpenMode, UINT64 Attributes);
-typedef UEFI_STATUS (*UEFI_FILE_CLOSE)(struct UEFI_FILE_PROTOCOL* This);
-typedef UEFI_STATUS (*UEFI_FILE_DELETE)(struct UEFI_FILE_PROTOCOL* This);
-typedef UEFI_STATUS (*UEFI_FILE_READ)(struct UEFI_FILE_PROTOCOL* This, UINTN* BufferSize, VOID* Buffer);
-typedef UEFI_STATUS (*UEFI_FILE_WRITE)(struct UEFI_FILE_PROTOCOL* This, UINTN* BufferSize, VOID* Buffer);
-typedef UEFI_STATUS (*UEFI_FILE_GET_POSITION)(struct UEFI_FILE_PROTOCOL* This, UINT64* Position);
-typedef UEFI_STATUS (*UEFI_FILE_SET_POSITION)(struct UEFI_FILE_PROTOCOL* This, UINT64 Position);
-typedef UEFI_STATUS (*UEFI_FILE_GET_INFO)(struct UEFI_FILE_PROTOCOL* This, UEFI_GUID* InformationType, UINTN* BufferSize, VOID* Buffer);
-typedef UEFI_STATUS (*UEFI_FILE_SET_INFO)(struct UEFI_FILE_PROTOCOL* This, UEFI_GUID* InformationType, UINTN BufferSize, VOID* Buffer);
-typedef UEFI_STATUS (*UEFI_FILE_FLUSH)(struct UEFI_FILE_PROTOCOL* This);
-typedef UEFI_STATUS (*UEFI_FILE_OPEN_EX)(struct UEFI_FILE_PROTOCOL* This, struct UEFI_FILE_PROTOCOL** NewHandle, CHAR16* FileName, UINT64 OpenMode, UINT64 Attributes, UEFI_FILE_IO_TOKEN* Token);
-typedef UEFI_STATUS (*UEFI_FILE_READ_EX)(struct UEFI_FILE_PROTOCOL* This, UEFI_FILE_IO_TOKEN* Token);
-typedef UEFI_STATUS (*UEFI_FILE_WRITE_EX)(struct UEFI_FILE_PROTOCOL* This, UEFI_FILE_IO_TOKEN* Token);
-typedef UEFI_STATUS (*UEFI_FILE_FLUSH_EX)(struct UEFI_FILE_PROTOCOL* This, UEFI_FILE_IO_TOKEN* Token);
+typedef UEFI_STATUS (*UEFI_FILE_OPEN)(struct UEFI_FILE_PROTOCOL *This, struct UEFI_FILE_PROTOCOL **NewHandle, CHAR16 *FileName, UINT64 OpenMode, UINT64 Attributes);
+typedef UEFI_STATUS (*UEFI_FILE_CLOSE)(struct UEFI_FILE_PROTOCOL *This);
+typedef UEFI_STATUS (*UEFI_FILE_DELETE)(struct UEFI_FILE_PROTOCOL *This);
+typedef UEFI_STATUS (*UEFI_FILE_READ)(struct UEFI_FILE_PROTOCOL *This, UINTN *BufferSize, VOID *Buffer);
+typedef UEFI_STATUS (*UEFI_FILE_WRITE)(struct UEFI_FILE_PROTOCOL *This, UINTN *BufferSize, VOID *Buffer);
+typedef UEFI_STATUS (*UEFI_FILE_GET_POSITION)(struct UEFI_FILE_PROTOCOL *This, UINT64 *Position);
+typedef UEFI_STATUS (*UEFI_FILE_SET_POSITION)(struct UEFI_FILE_PROTOCOL *This, UINT64 Position);
+typedef UEFI_STATUS (*UEFI_FILE_GET_INFO)(struct UEFI_FILE_PROTOCOL *This, UEFI_GUID *InformationType, UINTN *BufferSize, VOID *Buffer);
+typedef UEFI_STATUS (*UEFI_FILE_SET_INFO)(struct UEFI_FILE_PROTOCOL *This, UEFI_GUID *InformationType, UINTN BufferSize, VOID *Buffer);
+typedef UEFI_STATUS (*UEFI_FILE_FLUSH)(struct UEFI_FILE_PROTOCOL *This);
+typedef UEFI_STATUS (*UEFI_FILE_OPEN_EX)(struct UEFI_FILE_PROTOCOL *This, struct UEFI_FILE_PROTOCOL **NewHandle, CHAR16 *FileName, UINT64 OpenMode, UINT64 Attributes, UEFI_FILE_IO_TOKEN *Token);
+typedef UEFI_STATUS (*UEFI_FILE_READ_EX)(struct UEFI_FILE_PROTOCOL *This, UEFI_FILE_IO_TOKEN *Token);
+typedef UEFI_STATUS (*UEFI_FILE_WRITE_EX)(struct UEFI_FILE_PROTOCOL *This, UEFI_FILE_IO_TOKEN *Token);
+typedef UEFI_STATUS (*UEFI_FILE_FLUSH_EX)(struct UEFI_FILE_PROTOCOL *This, UEFI_FILE_IO_TOKEN *Token);
 
-typedef struct UEFI_FILE_PROTOCOL {
+typedef struct UEFI_FILE_PROTOCOL
+{
     UINT64                  Revision;
-    UEFI_FILE_OPEN           Open;
-    UEFI_FILE_CLOSE          Close;
-    UEFI_FILE_DELETE         Delete;
-    UEFI_FILE_READ           Read;
-    UEFI_FILE_WRITE          Write;
-    UEFI_FILE_GET_POSITION   GetPosition;
-    UEFI_FILE_SET_POSITION   SetPosition;
-    UEFI_FILE_GET_INFO       GetInfo;
-    UEFI_FILE_SET_INFO       SetInfo;
-    UEFI_FILE_FLUSH          Flush;
-    UEFI_FILE_OPEN_EX        OpenEx;
-    UEFI_FILE_READ_EX        ReadEx;
-    UEFI_FILE_WRITE_EX       WriteEx;
-    UEFI_FILE_FLUSH_EX       FlushEx;
+    UEFI_FILE_OPEN          Open;
+    UEFI_FILE_CLOSE         Close;
+    UEFI_FILE_DELETE        Delete;
+    UEFI_FILE_READ          Read;
+    UEFI_FILE_WRITE         Write;
+    UEFI_FILE_GET_POSITION  GetPosition;
+    UEFI_FILE_SET_POSITION  SetPosition;
+    UEFI_FILE_GET_INFO      GetInfo;
+    UEFI_FILE_SET_INFO      SetInfo;
+    UEFI_FILE_FLUSH         Flush;
+    UEFI_FILE_OPEN_EX       OpenEx;
+    UEFI_FILE_READ_EX       ReadEx;
+    UEFI_FILE_WRITE_EX      WriteEx;
+    UEFI_FILE_FLUSH_EX      FlushEx;
 } UEFI_FILE_PROTOCOL;
 
+// ============================================================================
 // Graphics Output Protocol
+// ============================================================================
 
-typedef struct UEFI_PIXEL_BITMASK {
+typedef struct UEFI_PIXEL_BITMASK
+{
     UINT32  RedMask;
     UINT32  GreenMask;
     UINT32  BlueMask;
     UINT32  ReservedMask;
 } UEFI_PIXEL_BITMASK;
 
-typedef enum UEFI_GRAPHICS_PIXEL_FORMAT {
+typedef enum UEFI_GRAPHICS_PIXEL_FORMAT
+{
     PixelRedGreenBlueReserved8BitPerColor,
     PixelBlueGreenRedReserved8BitPerColor,
     PixelBitMask,
@@ -604,7 +653,8 @@ typedef enum UEFI_GRAPHICS_PIXEL_FORMAT {
     PixelFormatMax
 } UEFI_GRAPHICS_PIXEL_FORMAT;
 
-typedef struct UEFI_GRAPHICS_OUTPUT_MODE_INFORMATION {
+typedef struct UEFI_GRAPHICS_OUTPUT_MODE_INFORMATION
+{
     UINT32                      Version;
     UINT32                      HorizontalResolution;
     UINT32                      VerticalResolution;
@@ -613,23 +663,26 @@ typedef struct UEFI_GRAPHICS_OUTPUT_MODE_INFORMATION {
     UINT32                      PixelsPerScanLine;
 } UEFI_GRAPHICS_OUTPUT_MODE_INFORMATION;
 
-typedef struct UEFI_GRAPHICS_OUTPUT_PROTOCOL_MODE {
-    UINT32                                 MaxMode;
-    UINT32                                 Mode;
-    UEFI_GRAPHICS_OUTPUT_MODE_INFORMATION* Info;
-    UINTN                                  SizeOfInfo;
-    UEFI_PHYSICAL_ADDRESS                  FrameBufferBase;
-    UINTN                                  FrameBufferSize;
+typedef struct UEFI_GRAPHICS_OUTPUT_PROTOCOL_MODE
+{
+    UINT32                                  MaxMode;
+    UINT32                                  Mode;
+    UEFI_GRAPHICS_OUTPUT_MODE_INFORMATION   *Info;
+    UINTN                                   SizeOfInfo;
+    UEFI_PHYSICAL_ADDRESS                   FrameBufferBase;
+    UINTN                                   FrameBufferSize;
 } UEFI_GRAPHICS_OUTPUT_PROTOCOL_MODE;
 
-typedef struct UEFI_GRAPHICS_OUTPUT_BLT_PIXEL {
+typedef struct UEFI_GRAPHICS_OUTPUT_BLT_PIXEL
+{
     UINT8   BLUE;
     UINT8   GREEN;
     UINT8   RED;
     UINT8   Reserved;
 } UEFI_GRAPHICS_OUTPUT_BLT_PIXEL;
 
-typedef enum UEFI_GRAPHICS_OUTPUT_BLT_OPERATION {
+typedef enum UEFI_GRAPHICS_OUTPUT_BLT_OPERATION
+{
     EfiBltVideoFill,
     EfiBltVideoToBltBuffer,
     EfiBltBufferToVideo,
@@ -639,71 +692,82 @@ typedef enum UEFI_GRAPHICS_OUTPUT_BLT_OPERATION {
 
 struct UEFI_GRAPHICS_OUTPUT_PROTOCOL;
 
-typedef UEFI_STATUS (*UEFI_GRAPHICS_OUTPUT_PROTOCOL_QUERY_MODE)(struct UEFI_GRAPHICS_OUTPUT_PROTOCOL* This, UINT32 ModeNumber, UINTN* SizeOfInfo, UEFI_GRAPHICS_OUTPUT_MODE_INFORMATION** Info);
-typedef UEFI_STATUS (*UEFI_GRAPHICS_OUTPUT_PROTOCOL_SET_MODE)(struct UEFI_GRAPHICS_OUTPUT_PROTOCOL* This, UINT32 ModeNumber);
-typedef UEFI_STATUS (*UEFI_GRAPHICS_OUTPUT_PROTOCOL_BLT)(struct UEFI_GRAPHICS_OUTPUT_PROTOCOL* This, UEFI_GRAPHICS_OUTPUT_BLT_PIXEL* BltBuffer, UEFI_GRAPHICS_OUTPUT_BLT_OPERATION BltOperation, UINTN SourceX, UINTN SourceY, UINTN DestinationX, UINTN DestinationY, UINTN Width, UINTN Height, UINTN Delta);
+typedef UEFI_STATUS (*UEFI_GRAPHICS_OUTPUT_PROTOCOL_QUERY_MODE)(struct UEFI_GRAPHICS_OUTPUT_PROTOCOL *This, UINT32 ModeNumber, UINTN *SizeOfInfo, UEFI_GRAPHICS_OUTPUT_MODE_INFORMATION **Info);
+typedef UEFI_STATUS (*UEFI_GRAPHICS_OUTPUT_PROTOCOL_SET_MODE)(struct UEFI_GRAPHICS_OUTPUT_PROTOCOL *This, UINT32 ModeNumber);
+typedef UEFI_STATUS (*UEFI_GRAPHICS_OUTPUT_PROTOCOL_BLT)(struct UEFI_GRAPHICS_OUTPUT_PROTOCOL *This, UEFI_GRAPHICS_OUTPUT_BLT_PIXEL *BltBuffer, UEFI_GRAPHICS_OUTPUT_BLT_OPERATION BltOperation, UINTN SourceX, UINTN SourceY, UINTN DestinationX, UINTN DestinationY, UINTN Width, UINTN Height, UINTN Delta);
 
-typedef struct UEFI_GRAPHICS_OUTPUT_PROTOCOL {
+typedef struct UEFI_GRAPHICS_OUTPUT_PROTOCOL
+{
     UEFI_GRAPHICS_OUTPUT_PROTOCOL_QUERY_MODE QueryMode;
     UEFI_GRAPHICS_OUTPUT_PROTOCOL_SET_MODE   SetMode;
     UEFI_GRAPHICS_OUTPUT_PROTOCOL_BLT        Blt;
     UEFI_GRAPHICS_OUTPUT_PROTOCOL_MODE       *Mode;
 } UEFI_GRAPHICS_OUTPUT_PROTOCOL;
 
+// ============================================================================
 // Loaded Image Protocol
+// ============================================================================
 
 #define UEFI_LOADED_IMAGE_PROTOCOL_REVISION  0x1000
 
 typedef UEFI_STATUS (*UEFI_IMAGE_UNLOAD)(UEFI_HANDLE ImageHandle);
 
-typedef struct UEFI_LOADED_IMAGE_PROTOCOL {
-    UINT32                     Revision;
-    UEFI_HANDLE                ParentHandle;
-    struct UEFI_SYSTEM_TABLE*  SystemTable;
-    UEFI_HANDLE                DeviceHandle;
-    UEFI_DEVICE_PATH_PROTOCOL* FilePath;
-    VOID*                      Reserved;
-    UINT32                     LoadOptionsSize;
-    VOID*                      LoadOptions;
-    VOID*                      ImageBase;
-    UINT64                     ImageSize;
-    UINTN                      ImageCodeType;
-    UEFI_IMAGE_UNLOAD          UnLoad;
+typedef struct UEFI_LOADED_IMAGE_PROTOCOL
+{
+    UINT32                    Revision;
+    UEFI_HANDLE               ParentHandle;
+    struct UEFI_SYSTEM_TABLE  *SystemTable;
+    UEFI_HANDLE               DeviceHandle;
+    UEFI_DEVICE_PATH_PROTOCOL *FilePath;
+    VOID                      *Reserved;
+    UINT32                    LoadOptionsSize;
+    VOID                      *LoadOptions;
+    VOID                      *ImageBase;
+    UINT64                    ImageSize;
+    UINTN                     ImageCodeType;
+    UEFI_IMAGE_UNLOAD         UnLoad;
 } UEFI_LOADED_IMAGE_PROTOCOL;
 
+// ============================================================================
 // Simple File System Protocol
+// ============================================================================
 
 #define UEFI_SIMPLE_FILE_SYSTEM_PROTOCOL_REVISION    0x00010000
 
 struct UEFI_SIMPLE_FILE_SYSTEM_PROTOCOL;
 
-typedef UEFI_STATUS (*UEFI_SIMPLE_FILE_SYSTEM_PROTOCOL_OPEN_VOLUME)(struct UEFI_SIMPLE_FILE_SYSTEM_PROTOCOL* This,  UEFI_FILE_PROTOCOL** Root);
+typedef UEFI_STATUS (*UEFI_SIMPLE_FILE_SYSTEM_PROTOCOL_OPEN_VOLUME)(struct UEFI_SIMPLE_FILE_SYSTEM_PROTOCOL *This,  UEFI_FILE_PROTOCOL **Root);
 
-typedef struct UEFI_SIMPLE_FILE_SYSTEM_PROTOCOL {
+typedef struct UEFI_SIMPLE_FILE_SYSTEM_PROTOCOL
+{
     UINT64                                       Revision;
     UEFI_SIMPLE_FILE_SYSTEM_PROTOCOL_OPEN_VOLUME OpenVolume;
 } UEFI_SIMPLE_FILE_SYSTEM_PROTOCOL;
 
+// ============================================================================
 // System Table
+// ============================================================================
 
-typedef struct UEFI_SYSTEM_TABLE {
+typedef struct UEFI_SYSTEM_TABLE
+{
     UEFI_TABLE_HEADER                   Hdr;
-    CHAR16*                             FirmwareVendor;
+    CHAR16                              *FirmwareVendor;
     UINT32                              FirmwareRevision;
     UEFI_HANDLE                         ConsoleInHandle;
-    UEFI_SIMPLE_TEXT_INPUT_PROTOCOL*    ConIn;
+    UEFI_SIMPLE_TEXT_INPUT_PROTOCOL     *ConIn;
     UEFI_HANDLE                         ConsoleOutHandle;
-    UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL*   ConOut;
+    UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *ConOut;
     UEFI_HANDLE                         StandardErrorHandle;
-    UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL*   StdErr;
-    UEFI_RUNTIME_SERVICES*              RuntimeServices;
-    UEFI_BOOT_SERVICES*                 BootServices;
+    UEFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *StdErr;
+    UEFI_RUNTIME_SERVICES               *RuntimeServices;
+    UEFI_BOOT_SERVICES                  *BootServices;
     UINTN                               NumberOfTableEntries;
-    UEFI_CONFIGURATION_TABLE*           ConfigurationTable;
+    UEFI_CONFIGURATION_TABLE            *ConfigurationTable;
 } UEFI_SYSTEM_TABLE;
 
-UEFI_SYSTEM_TABLE* uefi_system_table;
+void *uefiImageHandle;
+UEFI_SYSTEM_TABLE *uefiSystemTable;
 
-void uefi_init(void* ih, UEFI_SYSTEM_TABLE* st);
+void uefiInit(void *imageHandle, UEFI_SYSTEM_TABLE *systemTable);
 
 #endif // _UEFI_H

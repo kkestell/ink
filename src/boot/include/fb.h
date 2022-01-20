@@ -4,6 +4,6 @@
 #include "uefi.h"
 #include "boot_info.h"
 
-UEFI_STATUS fb_init(KernelBootInfo* bootInfo);
+UEFI_STATUS fb_init(KernelBootInfo *bootInfo);
 
 #endif // _FB_H
