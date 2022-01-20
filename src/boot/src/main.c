@@ -1,7 +1,7 @@
 #include "boot_info.h"
-#include "fb.h"
+#include "framebuffer.h"
 #include "loader.h"
-#include "mm.h"
+#include "memory_map.h"
 #include "printf.h"
 
 UEFI_STATUS uefi_main(void *imageHandle, UEFI_SYSTEM_TABLE *systemTable)
@@ -13,7 +13,7 @@ UEFI_STATUS uefi_main(void *imageHandle, UEFI_SYSTEM_TABLE *systemTable)
 
     // framebuffer
 
-    status = fb_init(&bootInfo);
+    status = framebuffer_init(&bootInfo);
     if (UEFI_ERROR(status))
     {
         kprintf(L"Error initializing framebuffer %s\r\n", uefiErrorMessage(status));
@@ -33,7 +33,7 @@ UEFI_STATUS uefi_main(void *imageHandle, UEFI_SYSTEM_TABLE *systemTable)
     // map memory
 
     UINTN memoryMapKey;
-    status = mm_init(&memoryMapKey, &bootInfo);
+    status = memory_map_init(&memoryMapKey, &bootInfo);
     if (UEFI_ERROR(status))
     {
         kprintf(L"Error initializing memory map %s\r\n", uefiErrorMessage(status));

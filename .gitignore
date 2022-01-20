@@ -1,3 +1,4 @@
+.vscode/
 *.cdr
 serial.log
 .DS_Store

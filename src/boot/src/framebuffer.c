@@ -1,8 +1,8 @@
-#include "fb.h"
+#include "framebuffer.h"
 #include "printf.h"
 #include "uefi.h"
 
-UEFI_STATUS fb_init(KernelBootInfo *bootInfo)
+UEFI_STATUS framebuffer_init(KernelBootInfo *bootInfo)
 {
     UEFI_STATUS status;
     UEFI_GRAPHICS_OUTPUT_PROTOCOL *gop;

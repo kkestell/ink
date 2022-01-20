@@ -1,5 +1,5 @@
-#include "uefi.h"
 #include "printf.h"
+#include "uefi.h"
 
 #define STATUS_CASE(symbol) \
     case symbol: \

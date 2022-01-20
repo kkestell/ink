@@ -2,7 +2,7 @@
 #include "uefi.h"
 #include "printf.h"
 
-UEFI_STATUS read_elf_identity(UEFI_FILE_PROTOCOL * const kernelImageFile, UINT8 **elfIdentityBuffer)
+UEFI_STATUS elf_read_identity(UEFI_FILE_PROTOCOL * const kernelImageFile, UINT8 **elfIdentityBuffer)
 {
     UEFI_STATUS status;
 
@@ -32,7 +32,7 @@ UEFI_STATUS read_elf_identity(UEFI_FILE_PROTOCOL * const kernelImageFile, UINT8 
     return UEFI_SUCCESS;
 }
 
-UEFI_STATUS validate_elf_identity(UINT8 *const elfIdentityBuffer)
+UEFI_STATUS elf_validate_identity(UINT8 *const elfIdentityBuffer)
 {
     if ((elfIdentityBuffer[EI_MAG0] != 0x7F) ||
         (elfIdentityBuffer[EI_MAG1] != 0x45) ||
@@ -58,7 +58,7 @@ UEFI_STATUS validate_elf_identity(UINT8 *const elfIdentityBuffer)
     return UEFI_SUCCESS;
 }
 
-UEFI_STATUS read_elf_file(UEFI_FILE_PROTOCOL * const kernelImageFile, void **kernelHeaderBuffer, void **kernelProgramHeadersBuffer)
+UEFI_STATUS elf_read_file(UEFI_FILE_PROTOCOL * const kernelImageFile, void **kernelHeaderBuffer, void **kernelProgramHeadersBuffer)
 {
     UEFI_STATUS status;
 
@@ -72,7 +72,7 @@ UEFI_STATUS read_elf_file(UEFI_FILE_PROTOCOL * const kernelImageFile, void **ker
         return status;
     }
 
-    bufferReadSize = sizeof(Elf64_Ehdr);
+    bufferReadSize = sizeof(ElfHeader);
 
     status = uefiSystemTable->BootServices->AllocatePool(UefiLoaderData, bufferReadSize, kernelHeaderBuffer);
     if (UEFI_ERROR(status))
@@ -88,8 +88,8 @@ UEFI_STATUS read_elf_file(UEFI_FILE_PROTOCOL * const kernelImageFile, void **ker
         return status;
     }
 
-    program_headers_offset = ((Elf64_Ehdr *)*kernelHeaderBuffer)->e_phoff;
-    bufferReadSize = sizeof(Elf64_Phdr) * ((Elf64_Ehdr *)*kernelHeaderBuffer)->e_phnum;
+    program_headers_offset = ((ElfHeader *)*kernelHeaderBuffer)->e_phoff;
+    bufferReadSize = sizeof(ElfProgramHeader) * ((ElfHeader *)*kernelHeaderBuffer)->e_phnum;
 
     status = kernelImageFile->SetPosition(kernelImageFile, program_headers_offset);
     if (UEFI_ERROR(status))

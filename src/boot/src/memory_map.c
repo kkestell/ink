@@ -1,7 +1,7 @@
-#include "mm.h"
+#include "memory_map.h"
 #include "printf.h"
 
-UEFI_STATUS mm_init(UINTN *memoryMapKey, KernelBootInfo *bootInfo) 
+UEFI_STATUS memory_map_init(UINTN *memoryMapKey, KernelBootInfo *bootInfo) 
 {
     UEFI_STATUS status;
 
