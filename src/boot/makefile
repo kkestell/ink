@@ -2,7 +2,7 @@ CC = clang
 CFLAGS = -Iinclude -target x86_64-pc-win32-coff -std=c11 -fno-stack-protector -fshort-wchar -mno-red-zone -Wall -Wextra -pedantic -Werror
 
 LD = lld
-LFLAGS = -flavor link -subsystem:efi_application -nodefaultlib -dll -entry:uefi_main
+LFLAGS = -flavor link -subsystem:efi_application -nodefaultlib -dll -entry:efi_main
 
 obj/%.o: src/%.c
 	mkdir -p $(@D)

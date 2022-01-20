@@ -1,58 +1,53 @@
 #include "boot_info.h"
-#include "fb.h"
+#include "framebuffer.h"
 #include "loader.h"
-#include "mm.h"
+#include "memory_map.h"
 #include "printf.h"
 
-UEFI_STATUS uefi_main(void* imageHandle, UEFI_SYSTEM_TABLE* systemTable)
+EFI_STATUS efi_main(void *image_handle, EFI_SYSTEM_TABLE *system_table)
 {
-    UEFI_STATUS status;
-    KernelBootInfo bootInfo;
+    EFI_STATUS status;
+    KernelBootInfo boot_info;
 
-    uefi_init(imageHandle, systemTable);
+    efi_init(image_handle, system_table);
 
-    // framebuffer
+    // Initialize framebuffer
 
-    status = fb_init(&bootInfo);
-    if (UEFI_ERROR(status))
+    status = framebuffer_init(&boot_info);
+    if (EFI_ERROR(status))
     {
-        kprintf(L"Error initializing framebuffer %s\r\n", uefi_error_message(status));
+        kprintf(L"Error initializing framebuffer %s\r\n", efi_error_message(status));
         return status;
     }
 
-    // load kernel
+    // Load kernel
 
-    UEFI_PHYSICAL_ADDRESS *kernelEntryPoint = 0;
-    status = load_kernel(kernelEntryPoint);
-    if (UEFI_ERROR(status))
+    EFI_PHYSICAL_ADDRESS *kernel_entry_point = 0;
+    status = load_kernel(kernel_entry_point);
+    if (EFI_ERROR(status))
     {
-        kprintf(L"Error loading kernel %s\r\n", uefi_error_message(status));
+        kprintf(L"Error loading kernel %s\r\n", efi_error_message(status));
         return status;
     }
 
-    // map memory
+    // Map memory
 
-    UINTN memoryMapKey;
-    status = mm_init(&memoryMapKey, &bootInfo);
-    if (UEFI_ERROR(status))
+    UINTN memory_map_key;
+    status = memory_map_init(&memory_map_key, &boot_info);
+    if (EFI_ERROR(status))
     {
-        kprintf(L"Error initializing memory map %s\r\n", uefi_error_message(status));
+        kprintf(L"Error initializing memory map %s\r\n", efi_error_message(status));
         return status;
     }
 
-    // exit boot services
+    // Exit boot services
 
-    status = uefi_system_table->BootServices->ExitBootServices(imageHandle, memoryMapKey);
-    if (UEFI_ERROR(status))
-    {
-        kprintf(L"Error exiting boot services %s\r\n", uefi_error_message(status));
-        return status;
-    }
+    EFI_BS_CALL(ExitBootServices(image_handle, memory_map_key));
 
-    // jump to kernel
+    // Jump to kernel
 
-    void (*kernelEntry)(KernelBootInfo *) = (void(*)(KernelBootInfo*))*kernelEntryPoint;
-    kernelEntry(&bootInfo);
+    void (*kernel_entry)(KernelBootInfo *) = (void(*)(KernelBootInfo *))*kernel_entry_point;
+    kernel_entry(&boot_info);
 
-    return UEFI_LOAD_ERROR;
+    return EFI_LOAD_ERROR;
 }

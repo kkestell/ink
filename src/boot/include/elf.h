@@ -1,7 +1,7 @@
 #ifndef _ELF_H
 #define _ELF_H
 
-#include "uefi.h"
+#include "efi.h"
 
 #define EI_NIDENT        16
 
@@ -24,14 +24,15 @@
 #define PT_PHDR            6
 #define PT_TLS             7
 
+typedef enum ElfFileClass 
+{
+    ELF_FILE_CLASS_NONE,
+    ELF_FILE_CLASS_32,
+    ELF_FILE_CLASS_64,
+} ElfFileClass;
 
-typedef enum e_file_class {
-    ELF_FILE_CLASS_NONE = 0,
-    ELF_FILE_CLASS_32 = 1,
-    ELF_FILE_CLASS_64 = 2,
-} Elf_File_Class;
-
-typedef struct s_elf64_hdr {
+typedef struct ElfHeader 
+{
     unsigned char e_ident[EI_NIDENT];
     UINT16 e_type;
     UINT16 e_machine;
@@ -46,9 +47,10 @@ typedef struct s_elf64_hdr {
     UINT16 e_shentsize;
     UINT16 e_shnum;
     UINT16 e_shstrndx;
-} Elf64_Ehdr;
+} ElfHeader;
 
-typedef struct s_elf64_phdr {
+typedef struct ElfProgramHeader 
+{
     UINT32 p_type;
     UINT32 p_flags;
     UINT64 p_offset;
@@ -57,14 +59,10 @@ typedef struct s_elf64_phdr {
     UINT64 p_filesz;
     UINT64 p_memsz;
     UINT64 p_align;
-} Elf64_Phdr;
+} ElfProgramHeader;
 
-void print_elf_file_info(void* const header_ptr, void* const program_headers_ptr);
-
-UEFI_STATUS read_elf_identity(UEFI_FILE_PROTOCOL* const kernel_img_file, UINT8** elf_identity_buffer);
-
-UEFI_STATUS read_elf_file(UEFI_FILE_PROTOCOL* const kernel_img_file, void** kernel_header_buffer, void** kernel_program_headers_buffer);
-
-UEFI_STATUS validate_elf_identity(UINT8* const elf_identity_buffer);
+EFI_STATUS elf_read_identity(EFI_FILE_PROTOCOL * const kernel_image_file, UINT8 **elf_identity_buffer);
+EFI_STATUS elf_read_file(EFI_FILE_PROTOCOL * const kernel_image_file, void **kernel_header_buffer, void **kernel_program_headers_buffer);
+EFI_STATUS elf_validate_identity(UINT8 * const elf_identity_buffer);
 
 #endif // _ELF_H

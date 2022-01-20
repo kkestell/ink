@@ -1,116 +1,94 @@
 #include "elf.h"
-#include "uefi.h"
+#include "efi.h"
 #include "printf.h"
 
-UEFI_STATUS read_elf_identity(UEFI_FILE_PROTOCOL* const kernelImageFile, UINT8** elfIdentityBuffer)
+EFI_STATUS elf_read_identity(EFI_FILE_PROTOCOL * const file, UINT8 **buffer)
 {
-    UEFI_STATUS status;
+    EFI_STATUS status;
 
-    UINTN bufferReadSize = EI_NIDENT;
-
-    status = kernelImageFile->SetPosition(kernelImageFile, 0);
-    if (UEFI_ERROR(status))
+    status = file->SetPosition(file, 0);
+    if (EFI_ERROR(status))
     {
-        kprintf(L"Error setting file position %s\r\n", uefi_error_message(status));
+        kprintf(L"Error setting file position %s\r\n", efi_error_message(status));
         return status;
     }
 
-    status = uefi_system_table->BootServices->AllocatePool(UefiLoaderData, bufferReadSize, (void**)elfIdentityBuffer);
-    if (UEFI_ERROR(status))
+    UINTN read_size = EI_NIDENT;
+    EFI_BS_CALL(AllocatePool(EfiLoaderData, read_size, (void**)buffer));
+
+    status = file->Read(file, &read_size, (void *)*buffer);
+    if (EFI_ERROR(status))
     {
-        kprintf(L"Error allocating kernel identity buffer %s\r\n", uefi_error_message(status));
+        kprintf(L"Error reading kernel identity %s\r\n", efi_error_message(status));
         return status;
     }
 
-    status = kernelImageFile->Read(kernelImageFile, &bufferReadSize, (void *)*elfIdentityBuffer);
-    if (UEFI_ERROR(status))
-    {
-        kprintf(L"Error reading kernel identity %s\r\n", uefi_error_message(status));
-        return status;
-    }
-
-    return UEFI_SUCCESS;
+    return EFI_SUCCESS;
 }
 
-UEFI_STATUS validate_elf_identity(UINT8* const elfIdentityBuffer)
+EFI_STATUS elf_validate_identity(UINT8 *const buffer)
 {
-    if ((elfIdentityBuffer[EI_MAG0] != 0x7F) ||
-        (elfIdentityBuffer[EI_MAG1] != 0x45) ||
-        (elfIdentityBuffer[EI_MAG2] != 0x4C) ||
-        (elfIdentityBuffer[EI_MAG3] != 0x46))
+    if ((buffer[EI_MAG0] != 0x7F) || (buffer[EI_MAG1] != 0x45) || (buffer[EI_MAG2] != 0x4C) || (buffer[EI_MAG3] != 0x46))
     {
         kprintf(L"Fatal Error: Invalid ELF header\r\n");
-        return UEFI_INVALID_PARAMETER;
+        return EFI_INVALID_PARAMETER;
     }
 
-    if (elfIdentityBuffer[EI_CLASS] != ELF_FILE_CLASS_64)
+    if (buffer[EI_CLASS] != ELF_FILE_CLASS_64)
     {
-        kprintf(L"Unsupported ELF file class %d\r\n", elfIdentityBuffer[EI_CLASS]);
-        return UEFI_UNSUPPORTED;
+        kprintf(L"Unsupported ELF file class %d\r\n", buffer[EI_CLASS]);
+        return EFI_UNSUPPORTED;
     }
 
-    if (elfIdentityBuffer[EI_DATA] != 1)
+    if (buffer[EI_DATA] != 1)
     {
         kprintf(L"Only LSB ELF executables are currently supported\r\n");
-        return UEFI_INCOMPATIBLE_VERSION;
+        return EFI_INCOMPATIBLE_VERSION;
     }
 
-    return UEFI_SUCCESS;
+    return EFI_SUCCESS;
 }
 
-UEFI_STATUS read_elf_file(UEFI_FILE_PROTOCOL* const kernelImageFile, void** kernelHeaderBuffer, void** kernelProgramHeadersBuffer)
+EFI_STATUS elf_read_file(EFI_FILE_PROTOCOL *const file, void **header, void **program_headers)
 {
-    UEFI_STATUS status;
+    EFI_STATUS status;
 
-    UINTN bufferReadSize = 0;
-    UINTN program_headers_offset = 0;
-
-    status = kernelImageFile->SetPosition(kernelImageFile, 0);
-    if (UEFI_ERROR(status))
+    status = file->SetPosition(file, 0);
+    if (EFI_ERROR(status))
     {
-        kprintf(L"Unable to set file position %s\r\n", uefi_error_message(status));
+        kprintf(L"Unable to set file position %s\r\n", efi_error_message(status));
         return status;
     }
 
-    bufferReadSize = sizeof(Elf64_Ehdr);
+    UINTN read_size = sizeof(ElfHeader);
 
-    status = uefi_system_table->BootServices->AllocatePool(UefiLoaderData, bufferReadSize, kernelHeaderBuffer);
-    if (UEFI_ERROR(status))
+    EFI_BS_CALL(AllocatePool(EfiLoaderData, read_size, header));
+
+    status = file->Read(file, &read_size, *header);
+    if (EFI_ERROR(status))
     {
-        kprintf(L"Unable to allocate memory for kernel image %s\r\n", uefi_error_message(status));
+        kprintf(L"Error reading ELF header %s\r\n", efi_error_message(status));
         return status;
     }
 
-    status = kernelImageFile->Read(kernelImageFile, &bufferReadSize, *kernelHeaderBuffer);
-    if (UEFI_ERROR(status))
+    UINTN program_headers_offset = ((ElfHeader *)*header)->e_phoff;
+    read_size = sizeof(ElfProgramHeader) * ((ElfHeader *)*header)->e_phnum;
+
+    status = file->SetPosition(file, program_headers_offset);
+    if (EFI_ERROR(status))
     {
-        kprintf(L"Error reading kernel image header %s\r\n", uefi_error_message(status));
+        kprintf(L"Unable to set file position %s\r\n", efi_error_message(status));
         return status;
     }
 
-    program_headers_offset = ((Elf64_Ehdr*)*kernelHeaderBuffer)->e_phoff;
-    bufferReadSize = sizeof(Elf64_Phdr) * ((Elf64_Ehdr*)*kernelHeaderBuffer)->e_phnum;
+    EFI_BS_CALL(AllocatePool(EfiLoaderData, read_size, program_headers));
 
-    status = kernelImageFile->SetPosition(kernelImageFile, program_headers_offset);
-    if (UEFI_ERROR(status))
+    status = file->Read(file, &read_size, *program_headers);
+    if (EFI_ERROR(status))
     {
-        kprintf(L"Unable to set file position %s\r\n", uefi_error_message(status));
+        kprintf(L"Error reading ELF program headers %s\r\n", efi_error_message(status));
         return status;
     }
 
-    status = uefi_system_table->BootServices->AllocatePool(UefiLoaderData, bufferReadSize, kernelProgramHeadersBuffer);
-    if (UEFI_ERROR(status))
-    {
-        kprintf(L"Error allocating memory for kernel program headers %s\r\n", uefi_error_message(status));
-        return status;
-    }
-
-    status = kernelImageFile->Read(kernelImageFile, &bufferReadSize, *kernelProgramHeadersBuffer);
-    if (UEFI_ERROR(status))
-    {
-        kprintf(L"Error reading kernel program headers %s\r\n", uefi_error_message(status));
-        return status;
-    }
-
-    return UEFI_SUCCESS;
+    return EFI_SUCCESS;
 }
