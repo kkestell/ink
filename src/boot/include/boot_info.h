@@ -6,7 +6,7 @@
 typedef struct kernel_boot_info
 {
     // mm
-    UEFI_MEMORY_DESCRIPTOR *memory_map;
+    UEFI_MEMORY_DESCRIPTOR* memory_map;
     uint64_t memory_map_size;
     uint64_t memory_map_key;
     uint64_t descriptor_size;

@@ -4,7 +4,7 @@
 #include "mm.h"
 #include "printf.h"
 
-UEFI_STATUS uefi_main(void *image_handle, UEFI_SYSTEM_TABLE *system_table)
+UEFI_STATUS uefi_main(void* image_handle, UEFI_SYSTEM_TABLE* system_table)
 {
     UEFI_STATUS status;
     kernel_boot_info boot_info;
@@ -53,7 +53,7 @@ UEFI_STATUS uefi_main(void *image_handle, UEFI_SYSTEM_TABLE *system_table)
 
     void (*kernel_entry)(kernel_boot_info *);
 
-    kernel_entry = (void (*)(kernel_boot_info *))*kernel_entry_point;
+    kernel_entry = (void (*)(kernel_boot_info*))*kernel_entry_point;
     kernel_entry(&boot_info);
 
     return UEFI_LOAD_ERROR;

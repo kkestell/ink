@@ -4,6 +4,6 @@
 #include "uefi.h"
 #include "boot_info.h"
 
-UEFI_STATUS mm_init(UINTN *memory_map_key, kernel_boot_info *boot_info);
+UEFI_STATUS mm_init(UINTN* memory_map_key, kernel_boot_info* boot_info);
 
 #endif // _MM_H

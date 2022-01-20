@@ -95,8 +95,8 @@ uint32_t rgb_to_color(rgb_color rgb)
 
 void julia(kernel_boot_info *boot_info)
 {
-    int32_t w = 1280;
-    int32_t h = 720;
+    int32_t w = boot_info->horizontal_resolution;
+    int32_t h = boot_info->vertical_resolution;
     double cRe, cIm;
     double newRe, newIm, oldRe, oldIm;
     double zoom = 1, moveX = 0, moveY = 0;
@@ -134,7 +134,7 @@ void julia(kernel_boot_info *boot_info)
     }
 }
 
-void clear(kernel_boot_info *boot_info)
+void clear(kernel_boot_info* boot_info)
 {
     uint32_t c = 0x3b6ea5;
 

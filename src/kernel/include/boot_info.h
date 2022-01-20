@@ -20,17 +20,17 @@ typedef enum pixel_format {
 
 typedef struct memory_map_descriptor
 {
-    uint32_t  type;
+    uint32_t type;
     uintptr_t physical_start;
     uintptr_t virtual_start;
-    uint64_t  count;
-    uint64_t  attributes;
+    uint64_t count;
+    uint64_t attributes;
 } memory_map_descriptor;
 
 typedef struct kernel_boot_info
 {
     // mm
-    uint64_t *memory_map;
+    uint64_t* memory_map;
     uint64_t memory_map_size;
     uint64_t memory_map_key;
     uint64_t descriptor_size;

@@ -31,27 +31,8 @@ typedef enum e_file_class {
     ELF_FILE_CLASS_64 = 2,
 } Elf_File_Class;
 
-/*
-typedef struct s_elf32_hdr {
-    unsigned char	e_ident[EI_NIDENT];
-    UINT16 e_type;
-    UINT16 e_machine;
-    UINT32 e_version;
-    UINT32 e_entry;
-    UINT32 e_phoff;
-    UINT32 e_shoff;
-    UINT32 e_flags;
-    UINT16 e_ehsize;
-    UINT16 e_phentsize;
-    UINT16 e_phnum;
-    UINT16 e_shentsize;
-    UINT16 e_shnum;
-    UINT16 e_shstrndx;
-} Elf32_Ehdr;
-*/
-
 typedef struct s_elf64_hdr {
-    unsigned char	e_ident[EI_NIDENT];
+    unsigned char e_ident[EI_NIDENT];
     UINT16 e_type;
     UINT16 e_machine;
     UINT32 e_version;
@@ -66,19 +47,6 @@ typedef struct s_elf64_hdr {
     UINT16 e_shnum;
     UINT16 e_shstrndx;
 } Elf64_Ehdr;
-
-/*
-typedef struct s_elf32_phdr {
-    UINT32 p_type;
-    UINT32 p_offset;
-    UINT32 p_vaddr;
-    UINT32 p_paddr;
-    UINT32 p_filesz;
-    UINT32 p_memsz;
-    UINT32 p_flags;
-    UINT32 p_align;
-} Elf32_Phdr;
-*/
 
 typedef struct s_elf64_phdr {
     UINT32 p_type;

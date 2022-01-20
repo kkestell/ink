@@ -1,7 +1,7 @@
 #include "mm.h"
 #include "printf.h"
 
-UEFI_STATUS mm_init(UINTN *memory_map_key, kernel_boot_info *boot_info) 
+UEFI_STATUS mm_init(UINTN* memory_map_key, kernel_boot_info* boot_info) 
 {
     UEFI_STATUS status;
 
@@ -14,7 +14,7 @@ UEFI_STATUS mm_init(UINTN *memory_map_key, kernel_boot_info *boot_info)
 
     if (UEFI_ERROR(status))
     {
-        // Always fails on the first attempt. Returns required buffer size.
+        // Always fails on the first attempt, but returns the required buffer size
         if (status != UEFI_BUFFER_TOO_SMALL)
         {
             kprintf(L"Error getting system memory map size %s\r\n", uefi_error_message(status));
@@ -29,7 +29,7 @@ UEFI_STATUS mm_init(UINTN *memory_map_key, kernel_boot_info *boot_info)
         AllocateAnyPages,
         UefiLoaderData,
         map_size,
-        (UEFI_PHYSICAL_ADDRESS *)boot_info->memory_map);
+        (UEFI_PHYSICAL_ADDRESS*)boot_info->memory_map);
 
     if (UEFI_ERROR(status))
     {

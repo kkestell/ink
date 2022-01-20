@@ -196,9 +196,7 @@ UEFI_STATUS load_segment(UEFI_FILE_PROTOCOL* const kernel_image_file,
         }
     }
 
-    // As per ELF Standard, if the size in memory is larger than the file size
-    // the segment is mandated to be zero filled.
-    // For more information on Refer to ELF standard page 34.
+    // If the size in memory is larger than the file size, the segment must be zero filled
     UEFI_PHYSICAL_ADDRESS zero_fill_start = segment_virtual_address + segment_file_size;
     UINTN zero_fill_count = segment_memory_size - segment_file_size;
 
@@ -264,11 +262,11 @@ UEFI_STATUS load_program_segments(UEFI_FILE_PROTOCOL* const kernel_image_file,
     return UEFI_SUCCESS;
 }
 
-UEFI_STATUS load_kernel(UEFI_PHYSICAL_ADDRESS *kernel_entry_point)
+UEFI_STATUS load_kernel(UEFI_PHYSICAL_ADDRESS* kernel_entry_point)
 {
     UEFI_STATUS status;
 
-    UEFI_SIMPLE_FILE_SYSTEM_PROTOCOL *file_system_service;
+    UEFI_SIMPLE_FILE_SYSTEM_PROTOCOL* file_system_service;
 
     UEFI_GUID guid = UEFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID;
 
@@ -279,7 +277,7 @@ UEFI_STATUS load_kernel(UEFI_PHYSICAL_ADDRESS *kernel_entry_point)
         return status;
     }
 
-    UEFI_FILE_PROTOCOL *root_file_system;
+    UEFI_FILE_PROTOCOL* root_file_system;
 
     status = file_system_service->OpenVolume(file_system_service, &root_file_system);
     if (UEFI_ERROR(status))
@@ -288,7 +286,7 @@ UEFI_STATUS load_kernel(UEFI_PHYSICAL_ADDRESS *kernel_entry_point)
         return status;
     }
 
-    UEFI_FILE_PROTOCOL *kernel_image_file;
+    UEFI_FILE_PROTOCOL* kernel_image_file;
 
     status = root_file_system->Open(root_file_system, &kernel_image_file, L"kernel.elf",  UEFI_FILE_MODE_READ, UEFI_FILE_READ_ONLY);
     if (UEFI_ERROR(status))

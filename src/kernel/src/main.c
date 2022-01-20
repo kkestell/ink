@@ -5,7 +5,7 @@
 #include "printf.h"
 #include "fb.h"
 
-void main(kernel_boot_info *boot_info)
+void main(kernel_boot_info* boot_info)
 {
     uart_init();
 

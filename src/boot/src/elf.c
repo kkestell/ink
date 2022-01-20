@@ -2,8 +2,8 @@
 #include "uefi.h"
 #include "printf.h"
 
-UEFI_STATUS read_elf_identity(UEFI_FILE_PROTOCOL *const kernel_image_file,
-                              UINT8 **elf_identity_buffer)
+UEFI_STATUS read_elf_identity(UEFI_FILE_PROTOCOL* const kernel_image_file,
+                              UINT8** elf_identity_buffer)
 {
     UEFI_STATUS status;
 
@@ -16,7 +16,7 @@ UEFI_STATUS read_elf_identity(UEFI_FILE_PROTOCOL *const kernel_image_file,
         return status;
     }
 
-    status = uefi_system_table->BootServices->AllocatePool(UefiLoaderData, buffer_read_size, (void **)elf_identity_buffer);
+    status = uefi_system_table->BootServices->AllocatePool(UefiLoaderData, buffer_read_size, (void**)elf_identity_buffer);
     if (UEFI_ERROR(status))
     {
         kprintf(L"Error allocating kernel identity buffer %s\r\n", uefi_error_message(status));
@@ -33,7 +33,7 @@ UEFI_STATUS read_elf_identity(UEFI_FILE_PROTOCOL *const kernel_image_file,
     return UEFI_SUCCESS;
 }
 
-UEFI_STATUS validate_elf_identity(UINT8 *const elf_identity_buffer)
+UEFI_STATUS validate_elf_identity(UINT8* const elf_identity_buffer)
 {
     if ((elf_identity_buffer[EI_MAG0] != 0x7F) ||
         (elf_identity_buffer[EI_MAG1] != 0x45) ||
@@ -59,9 +59,9 @@ UEFI_STATUS validate_elf_identity(UINT8 *const elf_identity_buffer)
     return UEFI_SUCCESS;
 }
 
-UEFI_STATUS read_elf_file(UEFI_FILE_PROTOCOL *const kernel_image_file,
-                          void **kernel_header_buffer,
-                          void **kernel_program_headers_buffer)
+UEFI_STATUS read_elf_file(UEFI_FILE_PROTOCOL* const kernel_image_file,
+                          void** kernel_header_buffer,
+                          void** kernel_program_headers_buffer)
 {
     UEFI_STATUS status;
 
@@ -91,8 +91,8 @@ UEFI_STATUS read_elf_file(UEFI_FILE_PROTOCOL *const kernel_image_file,
         return status;
     }
 
-    program_headers_offset = ((Elf64_Ehdr *)*kernel_header_buffer)->e_phoff;
-    buffer_read_size = sizeof(Elf64_Phdr) * ((Elf64_Ehdr *)*kernel_header_buffer)->e_phnum;
+    program_headers_offset = ((Elf64_Ehdr*)*kernel_header_buffer)->e_phoff;
+    buffer_read_size = sizeof(Elf64_Phdr) * ((Elf64_Ehdr*)*kernel_header_buffer)->e_phnum;
 
     status = kernel_image_file->SetPosition(kernel_image_file, program_headers_offset);
     if (UEFI_ERROR(status))

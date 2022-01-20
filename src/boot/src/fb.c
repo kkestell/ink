@@ -2,11 +2,11 @@
 #include "fb.h"
 #include "boot_info.h"
 
-UEFI_STATUS fb_init(kernel_boot_info *boot_info)
+UEFI_STATUS fb_init(kernel_boot_info* boot_info)
 {
     UEFI_STATUS status;
-    UEFI_GRAPHICS_OUTPUT_PROTOCOL *gop;
-    UEFI_GRAPHICS_OUTPUT_MODE_INFORMATION *info;
+    UEFI_GRAPHICS_OUTPUT_PROTOCOL* gop;
+    UEFI_GRAPHICS_OUTPUT_MODE_INFORMATION* info;
     
     UEFI_GUID guid = UEFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
     status = uefi_system_table->BootServices->LocateProtocol(&guid, 0, (void**)&gop);
@@ -38,15 +38,13 @@ UEFI_STATUS fb_init(kernel_boot_info *boot_info)
             return status;
         }
 
-        if (info->HorizontalResolution == 1280 && info->VerticalResolution == 720 && info->PixelFormat == PixelBlueGreenRedReserved8BitPerColor)
+        if (info->HorizontalResolution == 640 && info->VerticalResolution == 480 && info->PixelFormat == PixelBlueGreenRedReserved8BitPerColor)
         {
             status = gop->SetMode(gop, i);
             if (UEFI_ERROR(status))
             {
                 kprintf(L"Error setting display resolution");
             }
-
-            //clear();
 
             boot_info->horizontal_resolution = info->HorizontalResolution;
             boot_info->vertical_resolution = info->VerticalResolution;

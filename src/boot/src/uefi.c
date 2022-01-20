@@ -53,7 +53,7 @@ const wchar_t* uefi_error_message(UEFI_STATUS const status)
     }
 }
 
-void uefi_init(void *ih, UEFI_SYSTEM_TABLE *st)
+void uefi_init(void* ih, UEFI_SYSTEM_TABLE* st)
 {
     image_handle = ih;
     uefi_system_table = st;
