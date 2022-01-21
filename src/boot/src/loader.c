@@ -62,13 +62,13 @@ static EFI_STATUS load_program_segments(EFI_FILE_PROTOCOL *const file, void *con
         return EFI_INVALID_PARAMETER;
     }
 
-    ElfProgramHeader *ph = (ElfProgramHeader *)program_headers_buffer;
+    ElfProgramHeader *program_header = (ElfProgramHeader *)program_headers_buffer;
 
     for (UINTN p = 0; p < num_headers; p++)
     {
-        if (ph[p].p_type == PT_LOAD)
+        if (program_header[p].p_type == PT_LOAD)
         {
-            status = load_segment(file, ph[p].p_offset, ph[p].p_filesz, ph[p].p_memsz, ph[p].p_vaddr);
+            status = load_segment(file, program_header[p].p_offset, program_header[p].p_filesz, program_header[p].p_memsz, program_header[p].p_vaddr);
             if (EFI_ERROR(status))
             {
                 kprintf(L"Error loading segment %s\r\n",
