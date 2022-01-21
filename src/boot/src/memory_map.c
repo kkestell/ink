@@ -1,37 +1,28 @@
 #include "memory_map.h"
 #include "printf.h"
 
-UEFI_STATUS memory_map_init(UINTN *memoryMapKey, KernelBootInfo *bootInfo) 
+EFI_STATUS memory_map_init(UINTN *memory_map_key, KernelBootInfo *boot_info) 
 {
-    UEFI_STATUS status;
+    EFI_STATUS status;
 
-    status = uefiSystemTable->BootServices->GetMemoryMap(&bootInfo->memoryMapSize, NULL, memoryMapKey, &bootInfo->descriptorSize, &bootInfo->descriptorVersion);
-    if (UEFI_ERROR(status))
+    status = efi_system_table->BootServices->GetMemoryMap(&boot_info->memory_map_size, NULL, memory_map_key, &boot_info->descriptor_size, &boot_info->descriptor_version);
+    if (EFI_ERROR(status))
     {
-        // Always fails on the first attempt, but returns the required buffer size
-        if (status != UEFI_BUFFER_TOO_SMALL)
+        // Always fails on the first attempt, but returns the
+        // required buffer size
+        if (status != EFI_BUFFER_TOO_SMALL)
         {
-            kprintf(L"Error getting system memory map size %s\r\n", uefiErrorMessage(status));
+            kprintf(L"Error getting system memory map size %s\r\n", efi_error_message(status));
             return status;
         }
     }
 
-    UINTN mapSize = (bootInfo->memoryMapSize + 4095) / 4096;
-    bootInfo->memoryMapSize = mapSize * 4096;
+    UINTN map_size = (boot_info->memory_map_size + 4095) / 4096;
+    boot_info->memory_map_size = map_size * 4096;
 
-    status = uefiSystemTable->BootServices->AllocatePages(AllocateAnyPages, UefiLoaderData, mapSize, (UEFI_PHYSICAL_ADDRESS *)bootInfo->memoryMap);
-    if (UEFI_ERROR(status))
-    {
-        kprintf(L"Error allocating memory map buffer %s\r\n", uefiErrorMessage(status));
-        return status;
-    }
+    EFI_BS_CALL(AllocatePages(AllocateAnyPages, UefiLoaderData, map_size, (EFI_PHYSICAL_ADDRESS *)boot_info->memory_map));
 
-    status = uefiSystemTable->BootServices->GetMemoryMap(&bootInfo->memoryMapSize, bootInfo->memoryMap, memoryMapKey, &bootInfo->descriptorSize, &bootInfo->descriptorVersion);
-    if (UEFI_ERROR(status))
-    {
-        kprintf(L"Error getting system memory map %s\r\n", uefiErrorMessage(status));
-        return status;
-    }
+    EFI_BS_CALL(GetMemoryMap(&boot_info->memory_map_size, boot_info->memory_map, memory_map_key, &boot_info->descriptor_size, &boot_info->descriptor_version));
 
-    return UEFI_SUCCESS;
+    return EFI_SUCCESS;
 }

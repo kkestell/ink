@@ -1,11 +1,11 @@
 #include "boot_info.h"
 #include "uart.h"
 #include "printf.h"
-#include "fb.h"
+#include "framebuffer.h"
 
-void main(KernelBootInfo* bootInfo)
+void main(KernelBootInfo* boot_info)
 {
     uart_init();
-    clear(bootInfo);
+    clear(boot_info);
     while (1);
 }

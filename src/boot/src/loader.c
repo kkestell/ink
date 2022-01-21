@@ -2,263 +2,167 @@
 #include "loader.h"
 #include "printf.h"
 
-#define UEFI_BS_CALL(call) {                                                  \
-    status = uefiSystemTable->BootServices->call;                             \
-    if (UEFI_ERROR(status))                                                   \
-    {                                                                         \
-        kprintf(L"%s\r\n", uefiErrorMessage(status));                         \
-        return status;                                                        \
-    }                                                                         \
-}
-
-static UEFI_STATUS load_segment(UEFI_FILE_PROTOCOL *const kernelImageFile, UEFI_PHYSICAL_ADDRESS const segmentFileOffset, UINTN const segmentFileSize, UINTN const segmentMemorySize, UEFI_PHYSICAL_ADDRESS const segmentVirtualAddress)
+static EFI_STATUS load_segment(EFI_FILE_PROTOCOL *const file, EFI_PHYSICAL_ADDRESS const offset, UINTN const file_size, UINTN const memory_size, EFI_PHYSICAL_ADDRESS const address)
 {
-    UEFI_STATUS status;
-    void *programData = NULL;
-    UINTN bufferReadSize = 0;
-    UINTN segmentPageCount = UEFI_SIZE_TO_PAGES(segmentMemorySize);
+    EFI_STATUS status;
+    void *program_data = NULL;
+    UINTN read_size = 0;
+    UINTN page_count = EFI_SIZE_TO_PAGES(memory_size);
 
-    status = kernelImageFile->SetPosition(kernelImageFile, segmentFileOffset);
-    if (UEFI_ERROR(status))
+    status = file->SetPosition(file, offset);
+    if (EFI_ERROR(status))
     {
-        kprintf(L"Error setting file pointer position to segment offset %s\r\n", uefiErrorMessage(status));
+        kprintf(L"Error setting file pointer position to segment offset %s\r\n", efi_error_message(status));
         return status;
     }
 
-    UEFI_BS_CALL(AllocatePages(AllocateAnyPages, UefiLoaderData, segmentPageCount, (UEFI_PHYSICAL_ADDRESS*)segmentVirtualAddress));
+    EFI_BS_CALL(AllocatePages(AllocateAnyPages, UefiLoaderData, page_count, (EFI_PHYSICAL_ADDRESS *)address));
 
-    /*
-    status = uefiSystemTable->BootServices->AllocatePages(AllocateAnyPages, UefiLoaderData, segmentPageCount, (UEFI_PHYSICAL_ADDRESS*)segmentVirtualAddress);
-    if (UEFI_ERROR(status))
+    if(file_size > 0)
     {
-        kprintf(L"Error allocating pages for ELF segment %s\r\n", uefiErrorMessage(status));
-        return status;
-    }
-    */
+        read_size = file_size;
 
-    if(segmentFileSize > 0)
-    {
-        bufferReadSize = segmentFileSize;
+        EFI_BS_CALL(AllocatePool(UefiLoaderCode, read_size, (void **)&program_data));
 
-        UEFI_BS_CALL(AllocatePool(UefiLoaderCode, bufferReadSize, (void **)&programData));
-
-        /*
-        status = uefiSystemTable->BootServices->AllocatePool(UefiLoaderCode, bufferReadSize, (void **)&programData);
-        if (UEFI_ERROR(status))
+        status = file->Read(file, &read_size, (void *)program_data);
+        if (EFI_ERROR(status))
         {
-            kprintf(L"Error kernel segment buffer %s\r\n", uefiErrorMessage(status));
-            return status;
-        }
-        */
-
-        status = kernelImageFile->Read(kernelImageFile, &bufferReadSize, (void *)programData);
-        if (UEFI_ERROR(status))
-        {
-            kprintf(L"Error reading segment data %s\r\n", uefiErrorMessage(status));
+            kprintf(L"Error reading segment data %s\r\n", efi_error_message(status));
             return status;
         }
 
-        UEFI_BS_CALL(CopyMem((void *)segmentVirtualAddress, (void *)programData, segmentFileSize));
+        EFI_BS_CALL(CopyMem((void *)address, (void *)program_data, file_size));
 
-        /*
-        status = uefiSystemTable->BootServices->CopyMem((void *)segmentVirtualAddress, (void *)programData, segmentFileSize);
-        if (UEFI_ERROR(status))
-        {
-            kprintf(L"Error copying program section into memory %s\r\n", uefiErrorMessage(status));
-            return status;
-        }
-        */
-
-        UEFI_BS_CALL(FreePool(programData));
-
-        /*
-        status = uefiSystemTable->BootServices->FreePool(programData);
-        if (UEFI_ERROR(status))
-        {
-            kprintf(L"Error freeing program section %s\r\n", uefiErrorMessage(status));
-            return status;
-        }
-        */
+        EFI_BS_CALL(FreePool(program_data));
     }
 
     // If the size in memory is larger than the file size, the segment must be zero filled
-    UEFI_PHYSICAL_ADDRESS zeroFillStart = segmentVirtualAddress + segmentFileSize;
-    UINTN zeroFillCount = segmentMemorySize - segmentFileSize;
+    EFI_PHYSICAL_ADDRESS zero_fill_start = address + file_size;
+    UINTN zero_fill_count = memory_size - file_size;
 
-    if (zeroFillCount > 0)
+    if (zero_fill_count > 0)
     {
-        UEFI_BS_CALL(SetMem((void *)zeroFillStart, zeroFillCount, 0));
-
-        /*
-        status = uefiSystemTable->BootServices->SetMem((void *)zeroFillStart, zeroFillCount, 0);
-        if (UEFI_ERROR(status))
-        {
-            kprintf(L"Error zero filling segment %s\r\n", uefiErrorMessage(status));
-            return status;
-        }
-        */
+        EFI_BS_CALL(SetMem((void *)zero_fill_start, zero_fill_count, 0));
     }
 
-    return UEFI_SUCCESS;
+    return EFI_SUCCESS;
 }
 
-static UEFI_STATUS load_program_segments(UEFI_FILE_PROTOCOL * const kernelImageFile, void * const kernelHeaderBuffer, void * const kernelProgramHeadersBuffer)
+static EFI_STATUS load_program_segments(EFI_FILE_PROTOCOL *const file, void *const header_buffer, void *const program_headers_buffer)
 {
-    UEFI_STATUS status;
-    UINT16 numProgramHeaders = 0;
-    UINT16 numSegmentsLoaded = 0;
+    EFI_STATUS status;
+    UINT16 num_headers = 0;
+    UINT16 num_segments = 0;
 
-    numProgramHeaders = ((ElfHeader *)kernelHeaderBuffer)->e_phnum;
+    num_headers = ((ElfHeader *)header_buffer)->e_phnum;
 
-    if (numProgramHeaders == 0)
+    if (num_headers == 0)
     {
         kprintf(L"No program segments in kernel image\r\n");
-        return UEFI_INVALID_PARAMETER;
+        return EFI_INVALID_PARAMETER;
     }
 
-    ElfProgramHeader *program_headers = (ElfProgramHeader *)kernelProgramHeadersBuffer;
+    ElfProgramHeader *ph = (ElfProgramHeader *)program_headers_buffer;
 
-    for (UINTN p = 0; p < numProgramHeaders; p++)
+    for (UINTN p = 0; p < num_headers; p++)
     {
-        if (program_headers[p].p_type == PT_LOAD)
+        if (ph[p].p_type == PT_LOAD)
         {
-            status = load_segment(
-                kernelImageFile,
-                program_headers[p].p_offset,
-                program_headers[p].p_filesz,
-                program_headers[p].p_memsz,
-                program_headers[p].p_vaddr);
-
-            if (UEFI_ERROR(status))
+            status = load_segment(file, ph[p].p_offset, ph[p].p_filesz, ph[p].p_memsz, ph[p].p_vaddr);
+            if (EFI_ERROR(status))
             {
-                kprintf(L"Error loading segment %s\r\n", uefiErrorMessage(status));
+                kprintf(L"Error loading segment %s\r\n",
+                    efi_error_message(status));
                 return status;
             }
 
-            numSegmentsLoaded++;
+            num_segments++;
         }
     }
 
-    if (numSegmentsLoaded == 0)
+    if (num_segments == 0)
     {
         kprintf(L"No loadable program in kernel image\r\n");
-        return UEFI_NOT_FOUND;
+        return EFI_NOT_FOUND;
     }
 
-    return UEFI_SUCCESS;
+    return EFI_SUCCESS;
 }
 
-UEFI_STATUS load_kernel(UEFI_PHYSICAL_ADDRESS *kernelEntryPoint)
+EFI_STATUS load_kernel(EFI_PHYSICAL_ADDRESS *kernel_entry_point)
 {
-    UEFI_STATUS status;
+    EFI_STATUS status;
 
-    UEFI_SIMPLE_FILE_SYSTEM_PROTOCOL *fileSystemService;
+    EFI_GUID guid = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID;
+    EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *fs;
 
-    UEFI_GUID guid = UEFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID;
+    EFI_BS_CALL(LocateProtocol(&guid, 0, (void **)&fs));
 
-    UEFI_BS_CALL(LocateProtocol(&guid, 0, (void **)&fileSystemService));
+    EFI_FILE_PROTOCOL *root;
 
-    /*
-    status = uefiSystemTable->BootServices->LocateProtocol(&guid, 0, (void **)&fileSystemService);
-    if (UEFI_ERROR(status))
+    status = fs->OpenVolume(fs, &root);
+    if (EFI_ERROR(status))
     {
-        kprintf(L"Error initializing UEFI_SIMPLE_FILE_SYSTEM_PROTOCOL %s\r\n", uefiErrorMessage(status));
-        return status;
-    }
-    */
-
-    UEFI_FILE_PROTOCOL *rootFileSystem;
-
-    status = fileSystemService->OpenVolume(fileSystemService, &rootFileSystem);
-    if (UEFI_ERROR(status))
-    {
-        kprintf(L"Error opening root volume %s\r\n", uefiErrorMessage(status));
+        kprintf(L"Error opening root volume %s\r\n", efi_error_message(status));
         return status;
     }
 
-    UEFI_FILE_PROTOCOL *kernelImageFile;
+    EFI_FILE_PROTOCOL *file;
 
-    status = rootFileSystem->Open(rootFileSystem, &kernelImageFile, L"kernel.elf",  UEFI_FILE_MODE_READ, UEFI_FILE_READ_ONLY);
-    if (UEFI_ERROR(status))
+    status = root->Open(root, &file, L"kernel.elf", EFI_FILE_MODE_READ, EFI_FILE_READ_ONLY);
+    if (EFI_ERROR(status))
     {
-        kprintf(L"Error opening kernel %s\r\n", uefiErrorMessage(status));
+        kprintf(L"Error opening kernel %s\r\n", efi_error_message(status));
         return status;
     }
 
-    UINT8 *elfIdentityBuffer;
+    UINT8 *elf_identity_buffer;
 
-    status = elf_read_identity(kernelImageFile, &elfIdentityBuffer);
-    if (UEFI_ERROR(status))
+    status = elf_read_identity(file, &elf_identity_buffer);
+    if (EFI_ERROR(status))
     {
-        kprintf(L"Error reading ELF identity %s\r\n", uefiErrorMessage(status));
+        kprintf(L"Error reading ELF identity %s\r\n", efi_error_message(status));
         return status;
     }
 
-    status = elf_validate_identity(elfIdentityBuffer);
-    if (UEFI_ERROR(status))
+    status = elf_validate_identity(elf_identity_buffer);
+    if (EFI_ERROR(status))
     {
-        kprintf(L"Invalid ELF identity buffer %s\r\n", uefiErrorMessage(status));
+        kprintf(L"Invalid ELF identity buffer %s\r\n", efi_error_message(status));
         return status;
     }
 
-    UEFI_BS_CALL(FreePool(elfIdentityBuffer));
+    EFI_BS_CALL(FreePool(elf_identity_buffer));
 
-    /*
-    status = uefiSystemTable->BootServices->FreePool(elfIdentityBuffer);
-    if (UEFI_ERROR(status))
+    void *kernel_header;
+    void *kernel_program_headers;
+
+    status = elf_read_file(file, &kernel_header, &kernel_program_headers);
+    if (EFI_ERROR(status))
     {
-        kprintf(L"Error freeing ELF identity buffer %s\r\n", uefiErrorMessage(status));
-        return status;
-    }
-    */
-
-    void *kernelHeader;
-    void *kernelProgramHeaders;
-
-    status = elf_read_file(kernelImageFile, &kernelHeader, &kernelProgramHeaders);
-    if (UEFI_ERROR(status))
-    {
-        kprintf(L"Error reading ELF file %s\r\n", uefiErrorMessage(status));
+        kprintf(L"Error reading ELF file %s\r\n", efi_error_message(status));
         return status;
     }
 
-    *kernelEntryPoint = ((ElfHeader *)kernelHeader)->e_entry;
+    *kernel_entry_point = ((ElfHeader *)kernel_header)->e_entry;
 
-    status = load_program_segments(kernelImageFile, kernelHeader, kernelProgramHeaders);
-    if (UEFI_ERROR(status))
+    status = load_program_segments(file, kernel_header, kernel_program_headers);
+    if (EFI_ERROR(status))
     {
-        kprintf(L"Error loading ELF program segments %s\r\n", uefiErrorMessage(status));
+        kprintf(L"Error loading ELF program segments %s\r\n", efi_error_message(status));
         return status;
     }
 
-    status = kernelImageFile->Close(kernelImageFile);
-    if (UEFI_ERROR(status))
+    status = file->Close(file);
+    if (EFI_ERROR(status))
     {
-        kprintf(L"Error closing kernel image file %s\r\n", uefiErrorMessage(status));
+        kprintf(L"Error closing kernel image file %s\r\n", efi_error_message(status));
         return status;
     }
 
-    UEFI_BS_CALL(FreePool((void *)kernelHeader));
+    EFI_BS_CALL(FreePool((void *)kernel_header));
 
-    /*
-    status = uefiSystemTable->BootServices->FreePool((void *)kernelHeader);
-    if (UEFI_ERROR(status))
-    {
-        kprintf(L"Error freeing kernel header buffer %s\r\n", uefiErrorMessage(status));
-        return status;
-    }
-    */
+    EFI_BS_CALL(FreePool((void *)kernel_program_headers));
 
-    UEFI_BS_CALL(FreePool((void *)kernelProgramHeaders));
-
-    /*
-    status = uefiSystemTable->BootServices->FreePool((void *)kernelProgramHeaders);
-    if (UEFI_ERROR(status))
-    {
-        kprintf(L"Error freeing kernel program headers buffer %s\r\n", uefiErrorMessage(status));
-        return status;
-    }
-    */
-
-    return UEFI_SUCCESS;
+    return EFI_SUCCESS;
 }

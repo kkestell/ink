@@ -1,64 +1,61 @@
+#include "efi.h"
 #include "framebuffer.h"
 #include "printf.h"
-#include "uefi.h"
 
-UEFI_STATUS framebuffer_init(KernelBootInfo *bootInfo)
+EFI_STATUS framebuffer_init(KernelBootInfo *boot_info)
 {
-    UEFI_STATUS status;
-    UEFI_GRAPHICS_OUTPUT_PROTOCOL *gop;
-    UEFI_GRAPHICS_OUTPUT_MODE_INFORMATION *info;
+    EFI_STATUS status;
+    EFI_GRAPHICS_OUTPUT_PROTOCOL *gop;
+    EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *info;
     
-    UEFI_GUID guid = UEFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
-    status = uefiSystemTable->BootServices->LocateProtocol(&guid, 0, (void **)&gop);
-    if (UEFI_ERROR(status))
-    {
-        kprintf(L"Error initializing UEFI_GRAPHICS_OUTPUT_PROTOCOL %s\r\n", uefiErrorMessage(status));
-        return status;
-    }
+    EFI_GUID guid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
 
-    uint64_t size_of_info;
+    EFI_BS_CALL(LocateProtocol(&guid, 0, (void **)&gop));
 
-    status = gop->QueryMode(gop, gop->Mode == 0 ? 0 : gop->Mode->Mode, &size_of_info, &info);
-    if (status == UEFI_NOT_STARTED)
+    UINTN infosz;
+    UINTN modenum = gop->Mode == 0 ? 0 : gop->Mode->Mode;
+
+    status = gop->QueryMode(gop, modenum, NULL, NULL);
+    if (status == EFI_NOT_STARTED)
     {        
         status = gop->SetMode(gop, 0);
-        if (UEFI_ERROR(status))
+        if (EFI_ERROR(status))
         {
-            kprintf(L"Unable to determine native display resolution %s\r\n", uefiErrorMessage(status));
+            kprintf(L"Unable to determine native display resolution %s\r\n", efi_error_message(status));
             return status;
         }
     }
 
     for (uint32_t i = 0; i < gop->Mode->MaxMode; i++)
     {
-        status = gop->QueryMode(gop, i, &size_of_info, &info);
-        if (UEFI_ERROR(status))
+        status = gop->QueryMode(gop, i, &infosz, &info);
+        if (EFI_ERROR(status))
         {
             kprintf(L"Error querying mode");
             return status;
         }
 
-        if (info->HorizontalResolution == 640 && info->VerticalResolution == 480 && info->PixelFormat == PixelBlueGreenRedReserved8BitPerColor)
+        if (info->HorizontalResolution == 800 && info->VerticalResolution == 600 && info->PixelFormat == PixelBlueGreenRedReserved8BitPerColor)
         {
             status = gop->SetMode(gop, i);
-            if (UEFI_ERROR(status))
+            if (EFI_ERROR(status))
             {
-                kprintf(L"Error setting display resolution");
+                kprintf(L"Error setting display resolution %s\r\n", efi_error_message(status));
+                return status;
             }
 
-            bootInfo->horizontalResolution = info->HorizontalResolution;
-            bootInfo->verticalResolution = info->VerticalResolution;
-            bootInfo->pixelFormat = info->PixelFormat;
-            bootInfo->pixelInformation = info->PixelInformation;
-            bootInfo->pixelsPerScanLine = info->PixelsPerScanLine;
-            bootInfo->framebufferBaseAddress = gop->Mode->FrameBufferBase;
-            bootInfo->framebufferSize = gop->Mode->FrameBufferSize;
+            boot_info->horizontal_resolution    = info->HorizontalResolution;
+            boot_info->vertical_resolution      = info->VerticalResolution;
+            boot_info->pixel_format             = info->PixelFormat;
+            boot_info->pixel_information        = info->PixelInformation;
+            boot_info->pixels_per_scan_line     = info->PixelsPerScanLine;
+            boot_info->framebuffer_base_address = gop->Mode->FrameBufferBase;
+            boot_info->framebuffer_size         = gop->Mode->FrameBufferSize;
 
-            return UEFI_SUCCESS;
+            return EFI_SUCCESS;
         }
     }
 
     kprintf(L"Requested display resolution not available");
-
-    return UEFI_UNSUPPORTED;
+    return EFI_UNSUPPORTED;
 }

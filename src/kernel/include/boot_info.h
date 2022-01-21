@@ -21,29 +21,27 @@ typedef enum PixelFormat {
 typedef struct MemoryMapDescriptor
 {
     uint32_t type;
-    uintptr_t physicalStart;
-    uintptr_t virtualStart;
+    uintptr_t physical_start;
+    uintptr_t virtual_start;
     uint64_t count;
     uint64_t attributes;
 } MemoryMapDescriptor;
 
 typedef struct KernelBootInfo
 {
-    // mm
-    MemoryMapDescriptor* memoryMap;
-    uint64_t memoryMapSize;
-    uint64_t memoryMapKey;
-    uint64_t descriptorSize;
-    uint32_t descriptorVersion;
+    MemoryMapDescriptor* memory_map;
+    uint64_t memory_map_size;
+    uint64_t memory_map_key;
+    uint64_t descriptor_size;
+    uint32_t descriptor_version;
 
-    // fb
-    uint32_t horizontalResolution;
-    uint32_t verticalResolution;
-    PixelFormat pixelFormat;
-    PixelBitmask pixelBitmask;
-    uint32_t pixelsPerScanLine;
-    uint64_t framebufferBaseAddress;
-    uint64_t framebufferSize;
+    uint32_t horizontal_resolution;
+    uint32_t vertical_resolution;
+    PixelFormat pixel_format;
+    PixelBitmask pixel_bitmask;
+    uint32_t pixels_per_scan_line;
+    uint64_t framebuffer_base_address;
+    uint64_t framebuffer_size;
 } KernelBootInfo;
 
 #endif // _BOOT_INFO_H

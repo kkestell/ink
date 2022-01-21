@@ -1,7 +1,7 @@
 #ifndef _ELF_H
 #define _ELF_H
 
-#include "uefi.h"
+#include "efi.h"
 
 #define EI_NIDENT        16
 
@@ -61,8 +61,8 @@ typedef struct ElfProgramHeader
     UINT64 p_align;
 } ElfProgramHeader;
 
-UEFI_STATUS elf_read_identity(UEFI_FILE_PROTOCOL *const kernelImageFile, UINT8 **elfIdentityBuffer);
-UEFI_STATUS elf_read_file(UEFI_FILE_PROTOCOL *const kernelImageFile, void **kernelHeaderBuffer, void **kernelProgramHeadersBuffer);
-UEFI_STATUS elf_validate_identity(UINT8 *const elfIdentityBuffer);
+EFI_STATUS elf_read_identity(EFI_FILE_PROTOCOL * const kernel_image_file, UINT8 **elf_identity_buffer);
+EFI_STATUS elf_read_file(EFI_FILE_PROTOCOL * const kernel_image_file, void **kernel_header_buffer, void **kernel_program_headers_buffer);
+EFI_STATUS elf_validate_identity(UINT8 * const elf_identity_buffer);
 
 #endif // _ELF_H
