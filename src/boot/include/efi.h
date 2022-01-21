@@ -372,24 +372,24 @@ typedef struct EFI_DEVICE_PATH_PROTOCOL
 #define EFI_OPEN_PROTOCOL_BY_DRIVER             0x00000010
 #define EFI_OPEN_PROTOCOL_EXCLUSIVE             0x00000020
 
-#define UefiReservedMemoryType                   0x00000000
+#define EfiReservedMemoryType                   0x00000000
 
-#define UefiLoaderCode                           0x00000001
-#define UefiLoaderData                           0x00000002
+#define EfiLoaderCode                           0x00000001
+#define EfiLoaderData                           0x00000002
 
-#define UefiBootServicesCode                     0x00000003
-#define UefiBootServicesData                     0x00000004
-#define UefiRuntimeServicesCode                  0x00000005
-#define UefiRuntimeServicesData                  0x00000006
-#define UefiConventionalMemory                   0x00000007
-#define UefiUnusableMemory                       0x00000008
-#define UefiACPIReclaimMemory                    0x00000009
-#define UefiACPIMemoryNVS                        0x0000000a
-#define UefiMemoryMappedIO                       0x0000000b
-#define UefiMemoryMappedIOPortSpace              0x0000000c
-#define UefiPalCode                              0x0000000d
-#define UefiPersistentMemory                     0x0000000e
-#define UefiMaxMemoryType                        0x0000000e
+#define EfiBootServicesCode                     0x00000003
+#define EfiBootServicesData                     0x00000004
+#define EfiRuntimeServicesCode                  0x00000005
+#define EfiRuntimeServicesData                  0x00000006
+#define EfiConventionalMemory                   0x00000007
+#define EfiUnusableMemory                       0x00000008
+#define EfiACPIReclaimMemory                    0x00000009
+#define EfiACPIMemoryNVS                        0x0000000a
+#define EfiMemoryMappedIO                       0x0000000b
+#define EfiMemoryMappedIOPortSpace              0x0000000c
+#define EfiPalCode                              0x0000000d
+#define EfiPersistentMemory                     0x0000000e
+#define EfiMaxMemoryType                        0x0000000e
 
 typedef VOID (*EFI_EVENT_NOTIFY)(EFI_EVENT Event, VOID *Context);
 

@@ -2,7 +2,7 @@
 
 void put_pixel(KernelBootInfo *boot_info, uint32_t x, uint32_t y, uint32_t c)
 {
-    *((uint32_t*)(boot_info->framebuffer_base_address + 4 * boot_info->pixels_per_scan_line * y + 4 * x)) = c;
+    *((uint32_t*)(boot_info->framebuffer_base_address + 4 * boot_info->framebuffer_pixels_per_scan_line * y + 4 * x)) = c;
 }
 
 RgbColor hsv_to_rgb(HsvColor hsv)
@@ -95,8 +95,8 @@ uint32_t rgb_to_color(RgbColor rgb)
 
 void julia(KernelBootInfo *boot_info)
 {
-    int32_t w = boot_info->horizontal_resolution;
-    int32_t h = boot_info->vertical_resolution;
+    int32_t w = boot_info->framebuffer_width;
+    int32_t h = boot_info->framebuffer_height;
     double cRe, cIm;
     double newRe, newIm, oldRe, oldIm;
     double zoom = 1, moveX = 0, moveY = 0;
@@ -138,9 +138,9 @@ void clear(KernelBootInfo* boot_info)
 {
     uint32_t c = 0x3b6ea5;
 
-    for (uint32_t y = 0; y < boot_info->vertical_resolution; y++)
+    for (uint32_t y = 0; y < boot_info->framebuffer_height; y++)
     {
-        for (uint32_t x = 0; x < boot_info->horizontal_resolution; x++)
+        for (uint32_t x = 0; x < boot_info->framebuffer_width; x++)
         {
             put_pixel(boot_info, x, y, c);
         }

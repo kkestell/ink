@@ -14,7 +14,7 @@ EFI_STATUS elf_read_identity(EFI_FILE_PROTOCOL * const file, UINT8 **buffer)
     }
 
     UINTN read_size = EI_NIDENT;
-    EFI_BS_CALL(AllocatePool(UefiLoaderData, read_size, (void**)buffer));
+    EFI_BS_CALL(AllocatePool(EfiLoaderData, read_size, (void**)buffer));
 
     status = file->Read(file, &read_size, (void *)*buffer);
     if (EFI_ERROR(status))
@@ -62,7 +62,7 @@ EFI_STATUS elf_read_file(EFI_FILE_PROTOCOL *const file, void **header, void **pr
 
     UINTN read_size = sizeof(ElfHeader);
 
-    EFI_BS_CALL(AllocatePool(UefiLoaderData, read_size, header));
+    EFI_BS_CALL(AllocatePool(EfiLoaderData, read_size, header));
 
     status = file->Read(file, &read_size, *header);
     if (EFI_ERROR(status))
@@ -81,7 +81,7 @@ EFI_STATUS elf_read_file(EFI_FILE_PROTOCOL *const file, void **header, void **pr
         return status;
     }
 
-    EFI_BS_CALL(AllocatePool(UefiLoaderData, read_size, program_headers));
+    EFI_BS_CALL(AllocatePool(EfiLoaderData, read_size, program_headers));
 
     status = file->Read(file, &read_size, *program_headers);
     if (EFI_ERROR(status))

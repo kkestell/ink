@@ -16,13 +16,13 @@ static EFI_STATUS load_segment(EFI_FILE_PROTOCOL *const file, EFI_PHYSICAL_ADDRE
         return status;
     }
 
-    EFI_BS_CALL(AllocatePages(AllocateAnyPages, UefiLoaderData, page_count, (EFI_PHYSICAL_ADDRESS *)address));
+    EFI_BS_CALL(AllocatePages(AllocateAnyPages, EfiLoaderData, page_count, (EFI_PHYSICAL_ADDRESS *)address));
 
     if(file_size > 0)
     {
         read_size = file_size;
 
-        EFI_BS_CALL(AllocatePool(UefiLoaderCode, read_size, (void **)&program_data));
+        EFI_BS_CALL(AllocatePool(EfiLoaderCode, read_size, (void **)&program_data));
 
         status = file->Read(file, &read_size, (void *)program_data);
         if (EFI_ERROR(status))
