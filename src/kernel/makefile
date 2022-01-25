@@ -1,31 +1,46 @@
-CC = clang
-CFLAGS = -Iinclude -target x86_64-none-elf -std=c11 -ffreestanding -fomit-frame-pointer -Wall -Wextra -pedantic -Werror
-SFLAGS = -Iinclude -target x86_64-none-elf -Wall -Wextra -Werror
+OBJS = nimcache/*.o libnim/bin/libnim.a
 
-LD = ld.lld
-LFLAGS = --script=kernel.ld 
-
-obj/%.o: src/%.s
-	mkdir -p $(@D)
-	$(CC) $(SFLAGS) -c $< -o $@
-
-obj/%.o: src/%.c
-	mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-CFILES  = $(wildcard src/*.c)
-SFILES  = $(wildcard src/*.s)
-OFILES  = $(CFILES:src/%.c=obj/%.o)
-OFILES += $(SFILES:src/%.s=obj/%.o)
-
-DEPS = $(OFILES:%.o=%.d)
--include $(DEPS)
-
-all: bin/kernel.elf
-
-bin/kernel.elf: $(OFILES)
-	mkdir -p $(@D)
-	$(LD) $(LFLAGS) $(OFILES) -o $@
+bin/kernel.elf:
+	mkdir -p bin
+	make -C libnim
+	nim c --cpu:amd64 --os:any --mm:arc -d:useMalloc --nimcache=nimcache --noLinking --noMain --threads:off --checks:off --assertions:off \
+		--passC:"-Ilibnim/include -I/usr/include -ffreestanding -fno-pie -mcmodel=kernel -std=gnu11" -d:release --opt:size --header:main.h main.nim
+	ld -o bin/kernel.elf $(OBJS)
 
 clean:
-	rm -rf bin obj > /dev/null 2> /dev/null || true
+	rm -rf bin nimcache 
+	make -C libnim clean
+
+# CC	= gcc
+
+# %.o:%.c
+# 	$(CC) -g -c $<
+
+# NIMSRC	= main.nim
+# NIMOBJS	= nimcache/*.o
+# LNIMOBJS= libnim/print.o
+# OBJS	= $(NIMOBJS) libnim/libnim.a entry.o
+
+# clean:
+# 	rm -rf nimcache
+# 	make -C libnim clean
+
+# $(TARGET):$(OBJS)
+# 	$(CC) -o $@ $^ -nostdlib -lgcc
+
+# entry.o : nimcache/main.h
+
+# $(NIMOBJS):
+# 	make nim
+
+# nimcache/main.h:
+# 	make nim
+
+# nim:$(NIMSRC)
+# 	nim c --cpu:amd64 --os:linux --nimcache=nimcache --noLinking --noMain --passC:"-g" --passC:"-Ilibnim" --passC:"-ffreestanding" --passC:"-fno-pie" --passC:"-mcmodel=kernel" -d:release --header:main.h $(NIMSRC)
+
+# libnim/libnim.a:
+# 	make -C libnim
+
+# bin/kernel: $(OBJS)
+# 	ld -m64 -o $@ $^
