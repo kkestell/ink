@@ -4,4 +4,3 @@ serial.log
 .DS_Store
 bin/
 obj/
-nimcache/

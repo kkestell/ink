@@ -1,13 +1,13 @@
-OBJS = nimcache/*.o libnim/bin/libnim.a
+OBJS = obj/*.o src/libnim/bin/libnim.a
 
 all: bin/kernel.elf
 
 bin/kernel.elf:
 	mkdir -p $(@D)
-	make -C libnim
-	nim c main.nim
+	make -C src/libnim
+	nim c src/main.nim
 	ld -o $@ $(OBJS)
 
 clean:
-	rm -rf bin nimcache 
-	make -C libnim clean
+	rm -rf obj bin 
+	make -C src/libnim clean
