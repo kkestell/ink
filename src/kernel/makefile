@@ -1,31 +1,21 @@
-CC = clang
-CFLAGS = -Iinclude -target x86_64-none-elf -std=c11 -ffreestanding -fomit-frame-pointer -Wall -Wextra -pedantic -Werror
-SFLAGS = -Iinclude -target x86_64-none-elf -Wall -Wextra -Werror
-
-LD = ld.lld
-LFLAGS = --script=kernel.ld 
+bin/kernel.elf: kernel
+	mkdir -p $(@D)
+	ld -o $@ $(shell find obj/ -type f -name '*.o')
 
 obj/%.o: src/%.s
 	mkdir -p $(@D)
-	$(CC) $(SFLAGS) -c $< -o $@
+	as -c $< -o $@
 
 obj/%.o: src/%.c
 	mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c $< -o $@
+	gcc -Iinclude -ffreestanding -fno-pie -mcmodel=kernel -std=gnu11 -c $< -o $@
 
-CFILES  = $(wildcard src/*.c)
-SFILES  = $(wildcard src/*.s)
-OFILES  = $(CFILES:src/%.c=obj/%.o)
-OFILES += $(SFILES:src/%.s=obj/%.o)
+CFILES = $(shell find src/ -type f -name '*.c')
+SFILES = $(shell find src/ -type f -name '*.s')
+OFILES = $(CFILES:src/%.c=obj/%.o) $(SFILES:src/%.s=obj/%.o)
 
-DEPS = $(OFILES:%.o=%.d)
--include $(DEPS)
-
-all: bin/kernel.elf
-
-bin/kernel.elf: $(OFILES)
-	mkdir -p $(@D)
-	$(LD) $(LFLAGS) $(OFILES) -o $@
+kernel: $(OFILES)
+	nim c src/main.nim
 
 clean:
-	rm -rf bin obj > /dev/null 2> /dev/null || true
+	rm -rf obj bin 

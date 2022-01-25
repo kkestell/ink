@@ -2,7 +2,7 @@
 #include "framebuffer.h"
 #include "printf.h"
 
-EFI_STATUS framebuffer_init(KernelBootInfo *boot_info)
+EFI_STATUS framebuffer_init(kernel_framebuffer_info_t *framebuffer_info)
 {
     EFI_STATUS status;
 
@@ -43,13 +43,13 @@ EFI_STATUS framebuffer_init(KernelBootInfo *boot_info)
                 return status;
             }
 
-            boot_info->framebuffer_width                = info->HorizontalResolution;
-            boot_info->framebuffer_height               = info->VerticalResolution;
-            boot_info->framebuffer_pixel_format         = info->PixelFormat;
-            boot_info->framebuffer_pixel_information    = info->PixelInformation;
-            boot_info->framebuffer_pixels_per_scan_line = info->PixelsPerScanLine;
-            boot_info->framebuffer_base_address         = gop->Mode->FrameBufferBase;
-            boot_info->framebuffer_size                 = gop->Mode->FrameBufferSize;
+            framebuffer_info->framebuffer_width                = info->HorizontalResolution;
+            framebuffer_info->framebuffer_height               = info->VerticalResolution;
+            framebuffer_info->framebuffer_pixel_format         = info->PixelFormat;
+            framebuffer_info->framebuffer_pixel_information    = info->PixelInformation;
+            framebuffer_info->framebuffer_pixels_per_scan_line = info->PixelsPerScanLine;
+            framebuffer_info->framebuffer_base_address         = gop->Mode->FrameBufferBase;
+            framebuffer_info->framebuffer_size                 = gop->Mode->FrameBufferSize;
 
             return EFI_SUCCESS;
         }

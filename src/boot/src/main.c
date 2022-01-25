@@ -7,13 +7,13 @@
 EFI_STATUS efi_main(void *image_handle, EFI_SYSTEM_TABLE *system_table)
 {
     EFI_STATUS status;
-    KernelBootInfo boot_info;
+    kernel_boot_info_t boot_info;
 
     efi_init(image_handle, system_table);
 
     // Initialize framebuffer
 
-    status = framebuffer_init(&boot_info);
+    status = framebuffer_init(&boot_info.framebuffer);
     if (EFI_ERROR(status))
     {
         kprintf(L"Error initializing framebuffer %s\r\n", efi_error_message(status));
@@ -33,7 +33,7 @@ EFI_STATUS efi_main(void *image_handle, EFI_SYSTEM_TABLE *system_table)
     // Map memory
 
     UINTN memory_map_key;
-    status = memory_map_init(&memory_map_key, &boot_info);
+    status = memory_map_init(&memory_map_key, &boot_info.memory);
     if (EFI_ERROR(status))
     {
         kprintf(L"Error initializing memory map %s\r\n", efi_error_message(status));
@@ -46,7 +46,7 @@ EFI_STATUS efi_main(void *image_handle, EFI_SYSTEM_TABLE *system_table)
 
     // Jump to kernel
 
-    void (*kernel_entry)(KernelBootInfo *) = (void(*)(KernelBootInfo *))*kernel_entry_point;
+    void (*kernel_entry)(kernel_boot_info_t *) = (void(*)(kernel_boot_info_t *))*kernel_entry_point;
     kernel_entry(&boot_info);
 
     return EFI_LOAD_ERROR;
