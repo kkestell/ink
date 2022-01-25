@@ -2,9 +2,9 @@
 
 size_t strlen(const char *str)
 {
-	size_t n;
-	for (n = 0; *str != '\0'; str++, n++);
-	return n;
+    size_t n;
+    for (n = 0; *str != '\0'; str++, n++);
+    return n;
 }
 
 void *memcpy(void *s1, const void *s2, size_t n)
