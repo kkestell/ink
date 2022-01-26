@@ -1,7 +1,7 @@
-#include "kalloc.h"
-#include "printf.h"
-#include "string.h"
+#include <string.h>
 #include <strings.h>
+#include "kalloc.h"
+#include "kprintf.h"
 
 #define EfiMaxMemoryType      0x0000000e
 #define EfiConventionalMemory 0x00000007
@@ -21,6 +21,61 @@ typedef struct buddy
 } buddy_t;
 
 buddy_t *_buddy = NULL;
+
+static int count_blocks(int i)
+{
+    int count = 0;
+    void **p = &(_buddy->freelist[i]);
+
+    while (*p != NULL)
+    {
+        count++;
+        p = (void **) *p;
+    }
+
+    return count;
+}
+
+static int total_free()
+{
+    int i = 0;
+    int bytecount = 0;
+
+    for (i = 0; i <= MAX_ORDER; i++)
+    {
+        bytecount += count_blocks(i) * BLOCKSIZE(i);
+    }
+
+    return bytecount;
+}
+
+static void print_list(int i)
+{
+    kprintf("freelist[%d]: \n", i);
+
+    void **p = &_buddy->freelist[i];
+  
+    while (*p != NULL)
+    {
+        kprintf("    0x%08lx, 0x%08lx\n", (uintptr_t)*p, (uintptr_t)*p - (uintptr_t)_buddy->pool);
+        p = (void**) *p;
+    }
+}
+
+void kalloc_debug()
+{
+    kprintf("========================================\n");
+    kprintf("MEMPOOL size: %d\n", POOLSIZE);
+    kprintf("MEMPOOL start @ 0x%08x\n", (unsigned int) (uintptr_t)_buddy->pool);
+    kprintf("total free: %d\n", total_free());
+
+    for (int i = 0; i <= MAX_ORDER; i++)
+    {
+        print_list(i);
+    }
+
+    kprintf("========================================\n");
+}
 
 void *kmalloc(size_t size)
 {
@@ -164,6 +219,8 @@ void kalloc_init(kernel_memory_map_t *memory_map)
         ptr += memory_map->memory_map_descriptor_size;
         d = (kernel_memory_map_descriptor_t *)ptr;
     }
+
+    kprintf("kalloc_init: mapped %lu pages at 0x%lx\n", page_count, start);
 
     _buddy = (buddy_t *)start;
     memset(_buddy, 0, sizeof(buddy_t));

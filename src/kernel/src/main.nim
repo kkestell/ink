@@ -1,8 +1,7 @@
 import
   boot_info,
   framebuffer,
-  memory,
-  uart
+  platform
 
 initUart()
 
@@ -18,10 +17,12 @@ proc foo() =
 
   for i in countup(1, 100000):
     ints.add(i)
+  
+  debugMemory()
 
 foo()
 
-puts("Hello, World\n")
+debugMemory()
 
 while true:
   discard
