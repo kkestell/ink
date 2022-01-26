@@ -16,7 +16,9 @@ void uart_init(void)
     outb(UART_PORT_COM1 + 2, 0xC7); // Enable FIFO, clear them, with 14-byte threshold
     outb(UART_PORT_COM1 + 4, 0x0B); // IRQs enabled, RTS/DSR set
 
+#ifdef DEBUG
     uart_puts("uart_init: initialized\n");
+#endif
 }
 
 bool uart_is_recieve_buffer_empty(void)

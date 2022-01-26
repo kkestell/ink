@@ -1,19 +1,11 @@
 import
-  boot_info,
   framebuffer,
   platform
 
-initUart()
-
-let info = getBootInfo()
-
-initMemory(info.memory)
-
-initFramebuffer(info.framebuffer)
-initConsole(info.framebuffer)
-
+initPlatform()
 clearScreen()
-puts("The quick brown fox jumps over the lazy dog.\nHello World\nGoodbye World!\n")
+
+puts("Hello World\n")
 
 proc foo() =
   var ints: seq[int]
@@ -21,12 +13,10 @@ proc foo() =
   for i in countup(1, 100):
     ints.add(i)
     puts(i.repr.cstring)
-  
-  debugMemory()
 
 foo()
 
-debugMemory()
+puts("\nGoodbye World!\n")
 
 while true:
   discard

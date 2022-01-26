@@ -28,11 +28,3 @@ type
   KernelBootInfo* = object
     memory*: KernelMemoryMap
     framebuffer*: KernelFramebufferInfo
-
-proc getBootInfo*(): ref KernelBootInfo =
-  var info = new KernelBootInfo
-  asm """
-    movq %%r15,%0
-    : "=r" (`info`)
-  """
-  return info

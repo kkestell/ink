@@ -8,10 +8,6 @@
 
 uint8_t *head = NULL;
 
-void kalloc_debug()
-{
-}
-
 void kalloc_init(kernel_memory_map_t *memory_map)
 {
     kernel_memory_map_descriptor_t *d = memory_map->memory_map;
@@ -35,26 +31,38 @@ void kalloc_init(kernel_memory_map_t *memory_map)
         d = (kernel_memory_map_descriptor_t *)ptr;
     }
 
+#ifdef DEBUG
     kprintf(
         "kalloc_init: mapped %lu pages from 0x%lx to 0x%lx\n", 
         page_count,
         start,
         (uint64_t *)(((uint8_t *)start) + page_count * 4096));
+#endif
 
-    head = start;
+    head = (uint8_t *)start;
+}
+
+void kalloc_debug()
+{
 }
 
 void *kmalloc(size_t size)
 {
     void *ptr = head;
     head += size;
-    //kprintf("kmalloc: allocated %lu bytes at 0x%lx\n", size, ptr);
+
+#ifdef DEBUG
+    kprintf("kmalloc: allocated %lu bytes at 0x%lx\n", size, ptr);
+#endif
+
     return ptr;
 }
 
 void kfree(void *ptr)
 {
-    //kprintf("kmalloc: freeing ??? bytes at 0x%lx\n", ptr);   
+#ifdef DEBUG
+    kprintf("kmalloc: freeing ??? bytes at 0x%lx\n", ptr);   
+#endif
 }
 
 void *kcalloc(size_t number, size_t size)
@@ -62,7 +70,11 @@ void *kcalloc(size_t number, size_t size)
     void *new = head;
     head += number * size;
     bzero(new, number * size);
-    //kprintf("kcalloc: allocated %lu bytes at 0x%lx\n", size, new);
+
+#ifdef DEBUG
+    kprintf("kcalloc: allocated %lu bytes at 0x%lx\n", size, new);
+#endif
+
     return new;
 }
 
@@ -71,6 +83,10 @@ void *krealloc(void *ptr, size_t size)
     void *new = head;
     head += size;
     memcpy(new, ptr, size);
-    //kprintf("krealloc: allocated %lu bytes at 0x%lx\n", size, new);
+
+#ifdef DEBUG
+    kprintf("krealloc: allocated %lu bytes at 0x%lx\n", size, new);
+#endif
+
     return new;
 }

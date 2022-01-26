@@ -22,5 +22,8 @@ OFILES = $(CFILES:src/%.c=obj/%.o) $(SFILES:src/%.s=obj/%.o) $(DFILES:data/%=obj
 kernel: $(OFILES)
 	nim c src/main.nim
 
+format:
+	/nim/bin/nimpretty --maxLineLen:90 $(shell find src/ -type f -name '*.nim')
+
 clean:
 	rm -rf obj bin 
