@@ -1,4 +1,5 @@
 import
-    boot_info
+  boot_info
 
-proc initMemory*(memory_map: KernelMemoryMap) {.header: "kalloc.h", importc: "kalloc_init"}
+proc initMemory*(memory_map: KernelMemoryMap) {.header: "kalloc.h",
+    importc: "kalloc_init".}

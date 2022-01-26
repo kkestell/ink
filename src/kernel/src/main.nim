@@ -1,4 +1,4 @@
-import 
+import
   boot_info,
   framebuffer,
   memory,

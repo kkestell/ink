@@ -6,7 +6,8 @@ type
     reserved*: uint32
 
   PixelFormat* = enum
-    pfRedGreenBlueReserved8BitPerColor, pfBlueGreenRedReserved8BitPerColor, pfBitMask, pfBltOnly, pfMax
+    pfRedGreenBlueReserved8BitPerColor, pfBlueGreenRedReserved8BitPerColor,
+        pfBitMask, pfBltOnly, pfMax
 
   KernelMemoryMap* = object
     map*: pointer
