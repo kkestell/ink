@@ -1,6 +1,5 @@
 #include <stddef.h>
 #include <stdio.h>
-
 #include "kalloc.h"
 
 // signal.h
@@ -104,4 +103,3 @@ void bzero(void *p, size_t n)
   for (size_t i = 0; i < n; i++)
     c[i] = '\0';
 }
-
