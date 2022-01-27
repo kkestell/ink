@@ -8,18 +8,23 @@ initPlatform()
 let fb = getFramebuffer()
 fb.clearScreen()
 
-puts "Hello World\n"
+puts "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~\n"
 
-proc foo() =
+proc count() =
   var ints: seq[int]
 
-  for i in 1..100:
+  for i in 1..1_000_000:
     ints.add(i)
-    puts(i.repr.cstring)
 
-foo()
+proc fib(n: uint64): uint64 =
+  if n > 2.uint64 : return fib(n - 1) + fib(n - 2)
+  return n
 
-puts "\nGoodbye World!\n"
+puts "Counting to 1,000,000\n"
+count()
+
+puts "Calculating fib(46)\n"
+puts fib(46).repr.cstring
 
 while true:
   discard

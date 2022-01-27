@@ -12,7 +12,7 @@ obj/%.o: src/%.s
 
 obj/%.o: src/%.c
 	mkdir -p $(@D)
-	gcc -Iinclude -ffreestanding -fno-pie -mcmodel=kernel -std=gnu11 -c $< -o $@
+	gcc -Iinclude -ffreestanding -fno-pie -mcmodel=kernel -std=gnu11 -O3 -c $< -o $@
 
 CFILES = $(shell find src/ -type f -name '*.c')
 SFILES = $(shell find src/ -type f -name '*.s')
