@@ -2,6 +2,8 @@
 #include <string.h>
 #include "console.h"
 
+// ./sfnconv -U ProggyCleanSZ.pcf font_proggy.sfn
+
 //extern unsigned char _binary_data_font_proggy_sfn_start;
 extern unsigned char _binary_data_font_terminus_sfn_start;
 
