@@ -1,5 +1,4 @@
-#ifndef _ELF_H
-#define _ELF_H
+#pragma once
 
 #include "efi.h"
 
@@ -24,14 +23,14 @@
 #define PT_PHDR            6
 #define PT_TLS             7
 
-typedef enum ElfFileClass 
+typedef enum elf_file_class
 {
-    ELF_FILE_CLASS_NONE,
-    ELF_FILE_CLASS_32,
-    ELF_FILE_CLASS_64,
-} ElfFileClass;
+    ELF_FILE_CLASS_NONE = 0,
+    ELF_FILE_CLASS_32   = 1,
+    ELF_FILE_CLASS_64   = 2,
+} elf_file_class_t;
 
-typedef struct ElfHeader 
+typedef struct elf_header
 {
     unsigned char e_ident[EI_NIDENT];
     UINT16 e_type;
@@ -47,9 +46,9 @@ typedef struct ElfHeader
     UINT16 e_shentsize;
     UINT16 e_shnum;
     UINT16 e_shstrndx;
-} ElfHeader;
+} elf_header_t;
 
-typedef struct ElfProgramHeader 
+typedef struct elf_program_header 
 {
     UINT32 p_type;
     UINT32 p_flags;
@@ -59,10 +58,8 @@ typedef struct ElfProgramHeader
     UINT64 p_filesz;
     UINT64 p_memsz;
     UINT64 p_align;
-} ElfProgramHeader;
+} elf_program_header;
 
-EFI_STATUS elf_read_identity(EFI_FILE_PROTOCOL * const kernel_image_file, UINT8 **elf_identity_buffer);
-EFI_STATUS elf_read_file(EFI_FILE_PROTOCOL * const kernel_image_file, void **kernel_header_buffer, void **kernel_program_headers_buffer);
-EFI_STATUS elf_validate_identity(UINT8 * const elf_identity_buffer);
-
-#endif // _ELF_H
+EFI_STATUS elf_read_identity(EFI_FILE_PROTOCOL *const kernel_image_file, UINT8 **elf_identity_buffer);
+EFI_STATUS elf_read_file(EFI_FILE_PROTOCOL *const kernel_image_file, void **kernel_header_buffer, void **kernel_program_headers_buffer);
+EFI_STATUS elf_validate_identity(UINT8 *const elf_identity_buffer);

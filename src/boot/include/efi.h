@@ -1,5 +1,4 @@
-#ifndef _EFI_H
-#define _EFI_H
+#pragma once
 
 // ============================================================================
 // Basic types and constants
@@ -778,5 +777,3 @@ void *efi_image_handle;
 EFI_SYSTEM_TABLE *efi_system_table;
 
 void efi_init(void *image_handle, EFI_SYSTEM_TABLE *system_table);
-
-#endif // _EFI_H

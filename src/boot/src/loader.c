@@ -54,7 +54,7 @@ static EFI_STATUS load_program_segments(EFI_FILE_PROTOCOL *const file, void *con
     UINT16 num_headers = 0;
     UINT16 num_segments = 0;
 
-    num_headers = ((ElfHeader *)header_buffer)->e_phnum;
+    num_headers = ((elf_header_t *)header_buffer)->e_phnum;
 
     if (num_headers == 0)
     {
@@ -62,7 +62,7 @@ static EFI_STATUS load_program_segments(EFI_FILE_PROTOCOL *const file, void *con
         return EFI_INVALID_PARAMETER;
     }
 
-    ElfProgramHeader *program_header = (ElfProgramHeader *)program_headers_buffer;
+    elf_program_header *program_header = (elf_program_header *)program_headers_buffer;
 
     for (UINTN p = 0; p < num_headers; p++)
     {
@@ -144,7 +144,7 @@ EFI_STATUS load_kernel(EFI_PHYSICAL_ADDRESS *kernel_entry_point)
         return status;
     }
 
-    *kernel_entry_point = ((ElfHeader *)kernel_header)->e_entry;
+    *kernel_entry_point = ((elf_header_t *)kernel_header)->e_entry;
 
     status = load_program_segments(file, kernel_header, kernel_program_headers);
     if (EFI_ERROR(status))
