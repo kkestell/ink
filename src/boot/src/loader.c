@@ -1,6 +1,6 @@
 #include "elf.h"
 #include "loader.h"
-#include "printf.h"
+#include "kprintf.h"
 
 static EFI_STATUS load_segment(EFI_FILE_PROTOCOL *const file, EFI_PHYSICAL_ADDRESS const offset, UINTN const file_size, UINTN const memory_size, EFI_PHYSICAL_ADDRESS const address)
 {

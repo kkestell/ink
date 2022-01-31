@@ -1,4 +1,4 @@
-#include "printf.h"
+#include "kprintf.h"
 
 typedef void (*putcf)(wchar_t);
 static putcf stdout_putf;

@@ -4,5 +4,5 @@
 
 _start:
     movq %rcx, %r15
-    callq NimMain
+    callq start
     hlt

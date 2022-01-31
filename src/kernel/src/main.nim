@@ -1,30 +1,28 @@
 import
-  console,
-  framebuffer,
-  platform
+  base,
+  boot,
+  kalloc,
+  uart
 
-initPlatform()
+let cfg = getBootConfig()
 
-let fb = getFramebuffer()
-fb.clearScreen()
+uartInit()
+kallocInit(cfg.memory)
 
-puts "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~\n"
+proc fib(n: int): uint64 =
+  if n > 2 : return fib(n - 1) + fib(n - 2)
+  return cast[uint64](n)
 
-proc count() =
-  var ints: seq[int]
+proc fibs() =
+  var ints: seq[uint64]
 
-  for i in 1..1_000_000:
-    ints.add(i)
+  for i in 1..10:
+    ints.add(fib(i))
+  
+  for f in ints:
+    printf("%U\n", f)
 
-proc fib(n: uint64): uint64 =
-  if n > 2.uint64 : return fib(n - 1) + fib(n - 2)
-  return n
-
-puts "Counting to 1,000,000\n"
-count()
-
-puts "Calculating fib(46)\n"
-puts fib(46).repr.cstring
+fibs()
 
 while true:
   discard

@@ -2,7 +2,7 @@
 #include "framebuffer.h"
 #include "loader.h"
 #include "memory_map.h"
-#include "printf.h"
+#include "kprintf.h"
 
 EFI_STATUS efi_main(void *image_handle, EFI_SYSTEM_TABLE *system_table)
 {

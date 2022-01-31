@@ -1,9 +1,8 @@
 #include "elf.h"
 #include "efi.h"
-#include "printf.h"
+#include "kprintf.h"
 
-#define DEBUG
-
+/*
 void print_elf_file_info(void *const header_ptr, void *const program_headers_ptr)
 {
     elf_header_t* header = (elf_header_t*)header_ptr;
@@ -75,6 +74,7 @@ void print_elf_file_info(void *const header_ptr, void *const program_headers_ptr
         kprintf(L"\r\n");
     }
 }
+*/
 
 EFI_STATUS elf_read_identity(EFI_FILE_PROTOCOL * const file, UINT8 **buffer)
 {
