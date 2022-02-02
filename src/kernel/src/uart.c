@@ -1,51 +1,40 @@
-#include <stdint.h>
-#include <stddef.h>
-#include <stdbool.h>
-#include <port_io.h>
-#include "string.h"
+#include "types.h"
+#include "defs.h"
+#include "x86.h"
 
-#define UART_PORT_COM1 0x3f8
+#define COM1 0x3f8
 
-void uart_init(void)
+static int uart;
+
+void
+uartinit(void)
 {
-    outb(UART_PORT_COM1 + 1, 0x00); // Disable all interrupts
-    outb(UART_PORT_COM1 + 3, 0x80); // Enable DLAB (set baud rate divisor)
-    outb(UART_PORT_COM1 + 0, 0x03); // Set divisor to 3 (lo byte) 38400 baud
-    outb(UART_PORT_COM1 + 1, 0x00); //                  (hi byte)
-    outb(UART_PORT_COM1 + 3, 0x03); // 8 bits, no parity, one stop bit
-    outb(UART_PORT_COM1 + 2, 0xC7); // Enable FIFO, clear them, with 14-byte threshold
-    outb(UART_PORT_COM1 + 4, 0x0B); // IRQs enabled, RTS/DSR set
+  outb(COM1 + 1, 0x00); // Disable all interrupts
+  outb(COM1 + 3, 0x80); // Enable DLAB (set baud rate divisor)
+  outb(COM1 + 0, 0x03); // Set divisor to 3 (lo byte) 38400 baud
+  outb(COM1 + 1, 0x00); //                  (hi byte)
+  outb(COM1 + 3, 0x03); // 8 bits, no parity, one stop bit
+  outb(COM1 + 2, 0xC7); // Enable FIFO, clear them, with 14-byte threshold
+  outb(COM1 + 4, 0x0B); // IRQs enabled, RTS/DSR set
+
+  uart = 1;
+
+  for(char *p = "xv6...\n"; *p; p++)
+    uartputc(*p);
 }
 
-bool uart_is_recieve_buffer_empty(void)
+void
+uartputc(char a)
 {
-    return inb(UART_PORT_COM1 + 5) & 1;
+  if (!uart) return;
+  while (!((inb(COM1 + 5) & 0x20) != 0));
+  outb(COM1, a);
 }
 
-char uart_getchar(void)
+char
+uartgetc(void)
 {
-    while (!uart_is_recieve_buffer_empty());
-    return inb(UART_PORT_COM1);
-}
-
-bool uart_is_transmit_buffer_empty(void)
-{
-    return (inb(UART_PORT_COM1 + 5) & 0x20) != 0;
-}
-
-void uart_putchar(char a)
-{
-    while (!uart_is_transmit_buffer_empty());
-    outb(UART_PORT_COM1, a);
-}
-
-void uart_puts(const char* str)
-{
-    for(size_t i = 0; i < strlen(str); i++) 
-        uart_putchar(str[i]);
-}
-
-void _putchar(char c)
-{
-    uart_putchar(c);
+  if (!uart) return -1;
+  while (!(inb(COM1 + 5) & 1));
+  return inb(COM1);
 }

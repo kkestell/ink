@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -Iinclude -target x86_64-none-elf -std=c11 -ffreestanding -fomit-frame-pointer -Wall -Wextra -pedantic -Werror
+CFLAGS = -Iinclude -target x86_64-none-elf -std=c11 -ffreestanding -fomit-frame-pointer -Wall -Wextra -pedantic #-Werror
 SFLAGS = -Iinclude -target x86_64-none-elf -Wall -Wextra -Werror
 
 LD = ld.lld
@@ -15,11 +15,7 @@ obj/%.o: src/%.c
 
 CFILES  = $(wildcard src/*.c)
 SFILES  = $(wildcard src/*.s)
-OFILES  = $(CFILES:src/%.c=obj/%.o)
-OFILES += $(SFILES:src/%.s=obj/%.o)
-
-DEPS = $(OFILES:%.o=%.d)
--include $(DEPS)
+OFILES  = $(CFILES:src/%.c=obj/%.o) $(SFILES:src/%.s=obj/%.o)
 
 all: bin/kernel.elf
 
