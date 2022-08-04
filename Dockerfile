@@ -1,4 +1,4 @@
-FROM nimlang/nim
+FROM docker.io/nimlang/nim
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
   make \
   clang \
