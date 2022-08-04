@@ -1,6 +1,6 @@
 #include "efi.h"
 #include "framebuffer.h"
-#include "printf.h"
+#include "kprintf.h"
 
 EFI_STATUS framebuffer_init(kernel_framebuffer_info_t *framebuffer_info)
 {

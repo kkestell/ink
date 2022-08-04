@@ -1,11 +1,11 @@
-#pragma once
+// #pragma once
 
-#include <stdint.h>
-#include <stddef.h>
-#include "boot_info.h"
+// #include <stdint.h>
+// #include <stddef.h>
+// #include "boot_info.h"
 
-void kalloc_init(kernel_memory_map_t *memory_map);
-void *kmalloc(size_t size);
-void kfree(void *ptr);
-void *kcalloc(size_t number, size_t size);
-void *krealloc(void *ptr, size_t size);
+// void kalloc_init(kernel_memory_map_t *memory_map);
+// void *kmalloc(size_t size);
+// void kfree(void *ptr);
+// void *kcalloc(size_t number, size_t size);
+// void *krealloc(void *ptr, size_t size);

@@ -1,5 +1,5 @@
 #include "memory_map.h"
-#include "printf.h"
+#include "kprintf.h"
 
 EFI_STATUS memory_map_init(UINTN *memory_map_key, kernel_memory_info_t *memory_info) 
 {
