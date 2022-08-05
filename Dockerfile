@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM docker.io/ubuntu:20.04
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
   make \
   clang \

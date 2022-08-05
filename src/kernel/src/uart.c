@@ -22,7 +22,7 @@ bool uart_is_recieve_buffer_empty(void)
     return inb(UART_PORT_COM1 + 5) & 1;
 }
 
-char uart_getchar(void)
+char uart_get_char(void)
 {
     while (!uart_is_recieve_buffer_empty());
     return inb(UART_PORT_COM1);
@@ -33,7 +33,7 @@ bool uart_is_transmit_buffer_empty(void)
     return (inb(UART_PORT_COM1 + 5) & 0x20) != 0;
 }
 
-void uart_putchar(char a)
+void uart_put_char(char a)
 {
     while (!uart_is_transmit_buffer_empty());
     outb(UART_PORT_COM1, a);
@@ -42,10 +42,5 @@ void uart_putchar(char a)
 void uart_puts(const char* str)
 {
     for(size_t i = 0; i < strlen(str); i++) 
-        uart_putchar(str[i]);
-}
-
-void _putchar(char c)
-{
-    uart_putchar(c);
+        uart_put_char(str[i]);
 }

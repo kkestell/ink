@@ -23,7 +23,7 @@ typedef struct memory_map_descriptor
     uint32_t  type;
     uintptr_t physical_start;
     uintptr_t virtual_start;
-    uint64_t  count;
+    uint64_t  page_count;
     uint64_t  attributes;
 } memory_map_descriptor;
 
@@ -33,8 +33,8 @@ typedef struct kernel_boot_info
     uint64_t *memory_map;
     uint64_t memory_map_size;
     uint64_t memory_map_key;
-    uint64_t descriptor_size;
-    uint32_t descriptor_version;
+    uint64_t memory_map_descriptor_size;
+    uint32_t memory_map_descriptor_version;
 
     // fb
     uint32_t horizontal_resolution;
