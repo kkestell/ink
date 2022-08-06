@@ -5,7 +5,7 @@
 #include "boot_info.h"
 
 void
-kalloc_init(kernel_boot_info *boot_info);
+kalloc_init(memory_info_t *memory_info);
 
 void *
 kmalloc(size_t size);

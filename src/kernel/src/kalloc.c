@@ -1,7 +1,6 @@
 #include <string.h>
 #include "kalloc.h"
 #include "kprintf.h"
-#include "types.h"
 
 #define EfiMaxMemoryType      0x0000000e
 #define EfiConventionalMemory 0x00000007
@@ -46,14 +45,14 @@ void kalloc_debug()
 {
 }
 
-void kalloc_init(kernel_boot_info *boot_info)
+void kalloc_init(memory_info_t *memory_info)
 {
-    memory_map_descriptor *d = (memory_map_descriptor *)boot_info->memory_map;
+    memory_map_descriptor_t *d = memory_info->memory_map;
 
     uint64_t *start = NULL;
     uint64_t page_count = 0;
 
-    for (uint64_t i = 0; i < boot_info->memory_map_size / boot_info->memory_map_descriptor_size; i++)
+    for (uint64_t i = 0; i < memory_info->size / memory_info->descriptor_size; i++)
     {
         if (d->type == EfiConventionalMemory)
         {
@@ -65,8 +64,8 @@ void kalloc_init(kernel_boot_info *boot_info)
         }
 
         uint8_t *ptr = ((uint8_t *)d);
-        ptr += boot_info->memory_map_descriptor_size;
-        d = (memory_map_descriptor *)ptr;
+        ptr += memory_info->descriptor_size;
+        d = (memory_map_descriptor_t *)ptr;
     }
 
     kprintf("kalloc_init: mapped %U pages from %p to %p\num",

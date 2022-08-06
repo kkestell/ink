@@ -4,11 +4,11 @@
 #include <stdint.h>
 
 typedef struct pixel_bitmask {
-    uint32_t  red;
-    uint32_t  green;
-    uint32_t  blue;
-    uint32_t  reserved;
-} pixel_bitmask;
+    uint32_t red;
+    uint32_t green;
+    uint32_t blue;
+    uint32_t reserved;
+} pixel_bitmask_t;
 
 typedef enum pixel_format {
     PixelRedGreenBlueReserved8BitPerColor,
@@ -16,7 +16,7 @@ typedef enum pixel_format {
     PixelBitMask,
     PixelBltOnly,
     PixelFormatMax
-} pixel_format;
+} pixel_format_t;
 
 typedef struct memory_map_descriptor
 {
@@ -25,25 +25,32 @@ typedef struct memory_map_descriptor
     uintptr_t virtual_start;
     uint64_t  page_count;
     uint64_t  attributes;
-} memory_map_descriptor;
+} memory_map_descriptor_t;
 
-typedef struct kernel_boot_info
+typedef struct framebuffer_info
 {
-    // mm
-    uint64_t *memory_map;
-    uint64_t memory_map_size;
-    uint64_t memory_map_key;
-    uint64_t memory_map_descriptor_size;
-    uint32_t memory_map_descriptor_version;
+    uint32_t        width;
+    uint32_t        height;
+    pixel_format_t  pixel_format;
+    pixel_bitmask_t pixel_information;
+    uint32_t        pixels_per_scan_line;
+    uint64_t        base_address;
+    uint64_t        size;
+} framebuffer_info_t;
 
-    // fb
-    uint32_t horizontal_resolution;
-    uint32_t vertical_resolution;
-    pixel_format pixel_format;
-    pixel_bitmask pixel_bitmask;
-    uint32_t pixels_per_scan_line;
-    uint64_t framebuffer_base_address;
-    uint64_t framebuffer_size;
-} kernel_boot_info;
+typedef struct memory_info
+{
+    memory_map_descriptor_t *memory_map;
+    uint64_t                 size;
+    uint64_t                 key;
+    uint64_t                 descriptor_size;
+    uint32_t                 descriptor_version;
+} memory_info_t;
+
+typedef struct boot_info
+{
+    memory_info_t      memory_map;
+    framebuffer_info_t framebuffer;
+} boot_info_t;
 
 #endif // _BOOT_INFO_H

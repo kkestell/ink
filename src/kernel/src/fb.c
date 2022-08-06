@@ -1,8 +1,8 @@
 #include "fb.h"
 
-void put_pixel(kernel_boot_info *boot_info, uint32_t x, uint32_t y, uint32_t c)
+void put_pixel(framebuffer_info_t *framebuffer_info, uint32_t x, uint32_t y, uint32_t c)
 {
-    *((uint32_t*)(boot_info->framebuffer_base_address + 4 * boot_info->pixels_per_scan_line * y + 4 * x)) = c;
+    *((uint32_t*)(framebuffer_info->base_address + 4 * framebuffer_info->pixels_per_scan_line * y + 4 * x)) = c;
 }
 
 rgb_color hsv_to_rgb(hsv_color hsv)
@@ -93,10 +93,10 @@ uint32_t rgb_to_color(rgb_color rgb)
     return color;
 }
 
-void julia(kernel_boot_info *boot_info)
+void julia(framebuffer_info_t *framebuffer_info)
 {
-    int32_t w = 1280;
-    int32_t h = 720;
+    int32_t w = framebuffer_info->width;
+    int32_t h = framebuffer_info->height;
     double cRe, cIm;
     double newRe, newIm, oldRe, oldIm;
     double zoom = 1, moveX = 0, moveY = 0;
@@ -129,20 +129,20 @@ void julia(kernel_boot_info *boot_info)
             c.s = 255;
             c.v = 255 * (i < maxIterations);
 
-            put_pixel(boot_info, x, y, rgb_to_color(hsv_to_rgb(c)));
+            put_pixel(framebuffer_info, x, y, rgb_to_color(hsv_to_rgb(c)));
         }
     }
 }
 
-void clear(kernel_boot_info *boot_info)
+void clear(framebuffer_info_t *framebuffer_info)
 {
     uint32_t c = 0x3b6ea5;
 
-    for (uint32_t y = 0; y < boot_info->vertical_resolution; y++)
+    for (uint32_t y = 0; y < framebuffer_info->height; y++)
     {
-        for (uint32_t x = 0; x < boot_info->horizontal_resolution; x++)
+        for (uint32_t x = 0; x < framebuffer_info->width; x++)
         {
-            put_pixel(boot_info, x, y, c);
+            put_pixel(framebuffer_info, x, y, c);
         }
     }
 }
