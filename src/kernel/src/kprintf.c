@@ -1,22 +1,22 @@
 #include <stddef.h>
 #include <stdarg.h>
 #include <stdbool.h>
-#include "types.h"
+#include <stdint.h>
 #include "uart.h"
 
 typedef void (*putc)(char);
 
 static void
-u64toa(u64 num, u8 base, char *bf)
+u64toa(uint64_t num, uint8_t base, char *bf)
 {
-    u64 d = 1;
+    uint64_t d = 1;
     while (num / d >= base)
     {
         d *= base;
     }
     while (d != 0)
     {
-        u64 dgt = num / d;
+        uint64_t dgt = num / d;
         num %= d;
         d /= base;
         *bf++ = dgt + (dgt < 10 ? '0' : 'a' - 10);
@@ -25,9 +25,9 @@ u64toa(u64 num, u8 base, char *bf)
 }
 
 static void
-u32toa(u32 num, u8 base, char *bf)
+u32toa(uint32_t num, uint8_t base, char *bf)
 {
-    u32 d = 1;
+    uint32_t d = 1;
 
     while (num / d >= base)
     {
@@ -36,7 +36,7 @@ u32toa(u32 num, u8 base, char *bf)
 
     while (d != 0)
     {
-        u32 dgt = num / d;
+        uint32_t dgt = num / d;
         num %= d;
         d /= base;
         *bf++ = dgt + (dgt < 10 ? '0' : 'a' - 10);
@@ -70,18 +70,18 @@ format(putc putf, char *fmt, va_list va)
             {
                 // 64-bit pointer, hex
                 case 'p':
-                    u64toa(va_arg(va, u64), 16, bf);
+                    u64toa(va_arg(va, uint64_t), 16, bf);
                     puts("0x");
                     puts(bf);
                     break;
                 // 64-bit integer
                 case 'U':
-                    u64toa(va_arg(va, u64), 10, bf);
+                    u64toa(va_arg(va, uint64_t), 10, bf);
                     puts(bf);
                     break;
                 // 32-bit integer
                 case 'u':
-                    u32toa(va_arg(va, u32), 10, bf);
+                    u32toa(va_arg(va, uint32_t), 10, bf);
                     puts(bf);
                     break;
                 default:

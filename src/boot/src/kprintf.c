@@ -1,9 +1,9 @@
-#include "printf.h"
+#include "kprintf.h"
 
 typedef void (*putcf)(wchar_t);
 static putcf stdout_putf;
 
-static void uli2a(unsigned long int num, unsigned int base, int uc, wchar_t* bf)
+static void uli2a(unsigned long int num, unsigned int base, int uc, wchar_t *bf)
 {
     int n = 0;
     unsigned int d = 1;
@@ -35,7 +35,7 @@ static void li2a(long num, wchar_t* bf)
     uli2a(num, 10, 0, bf);
 }
 
-static void ui2a(unsigned int num, unsigned int base, int uc, wchar_t* bf)
+static void ui2a(unsigned int num, unsigned int base, int uc, wchar_t *bf)
 {
     int n = 0;
     unsigned int d = 1;
@@ -57,7 +57,7 @@ static void ui2a(unsigned int num, unsigned int base, int uc, wchar_t* bf)
     *bf = 0;
 }
 
-static void i2a(int num, wchar_t* bf)
+static void i2a(int num, wchar_t *bf)
 {
     if (num < 0)
     {
@@ -79,9 +79,9 @@ static int a2d(wchar_t ch)
         return -1;
 }
 
-static wchar_t a2i(wchar_t ch, wchar_t** src, int base, int* nump)
+static wchar_t a2i(wchar_t ch, wchar_t **src, int base, int *nump)
 {
-    wchar_t* p = *src;
+    wchar_t *p = *src;
     int num = 0;
     int digit;
     while ((digit = a2d(ch)) >= 0)
@@ -96,11 +96,11 @@ static wchar_t a2i(wchar_t ch, wchar_t** src, int base, int* nump)
     return ch;
 }
 
-static void putchw(putcf putf, int n, wchar_t z, wchar_t* bf)
+static void putchw(putcf putf, int n, wchar_t z, wchar_t *bf)
 {
     wchar_t fc = z ? '0' : ' ';
     wchar_t ch;
-    wchar_t* p = bf;
+    wchar_t *p = bf;
     while (*p++ && n > 0)
         n--;
     while (n-- > 0)
@@ -109,7 +109,7 @@ static void putchw(putcf putf, int n, wchar_t z, wchar_t* bf)
         putf(ch);
 }
 
-static void format(putcf putf, wchar_t* fmt, va_list va)
+static void format(putcf putf, wchar_t *fmt, va_list va)
 {
     wchar_t bf[12];
 
@@ -190,7 +190,7 @@ void kprintf_init(void (*putf)(wchar_t))
     stdout_putf = putf;
 }
 
-void kprintf(wchar_t* fmt, ...)
+void kprintf(wchar_t *fmt, ...)
 {
     va_list va;
     va_start(va, fmt);

@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -Iinclude -target x86_64-none-elf -std=c11 -ffreestanding -fomit-frame-pointer -Wall -Wextra -pedantic -Werror
+CFLAGS = -O3 -Iinclude -target x86_64-none-elf -std=c11 -ffreestanding -fomit-frame-pointer -Wall -Wextra -pedantic -Werror
 
 LD = ld.lld
 LFLAGS = --script=kernel.ld 

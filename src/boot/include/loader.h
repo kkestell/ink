@@ -1,8 +1,5 @@
-#ifndef _LOADER_H
-#define _LOADER_H
+#pragma once
 
-#include "uefi.h"
+#include "efi.h"
 
-UEFI_STATUS load_kernel();
-
-#endif // _LOADER_H
+EFI_STATUS load_kernel(EFI_PHYSICAL_ADDRESS *kernel_entry_point);
