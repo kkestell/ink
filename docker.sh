@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-podman build --tag=ink .
-podman run \
+docker build --tag=ink .
+docker run \
     -it \
     --rm \
     --mount type=bind,source="$(pwd)",target=/ink \
