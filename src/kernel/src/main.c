@@ -7,8 +7,13 @@
 #include "fb.h"
 
 void main(boot_info_t *boot_info)
-{
-    uart_init();
+{   
+    if (uart_init())
+    {
+        kprintf("UART init failed\n");
+        while (1);
+    }
+
     kalloc_init(&boot_info->memory_map);
 
     kprintf("MEMORY MAP\n");
@@ -31,11 +36,9 @@ void main(boot_info_t *boot_info)
     kprintf("framebuffer_size:         %U\n", boot_info->framebuffer.size);
     kprintf("\n");
 
-    int *arr = (int *)kmalloc(sizeof(int) * 100);
+    int *arr = (int *)kmalloc(sizeof(uint32_t) * 100);
     for (int i = 0; i < 100; i++) {
-        arr[i] = i * 10;
-    }
-    for (int i = 0; i < 100; i++) {
+        arr[i] = i;
         kprintf("%u ", arr[i]);
     }
     kprintf("\n");

@@ -6,7 +6,7 @@
 
 #define UART_PORT_COM1 0x3f8
 
-void uart_init(void)
+int uart_init(void)
 {
     outb(UART_PORT_COM1 + 1, 0x00); // Disable all interrupts
     outb(UART_PORT_COM1 + 3, 0x80); // Enable DLAB (set baud rate divisor)
@@ -15,6 +15,18 @@ void uart_init(void)
     outb(UART_PORT_COM1 + 3, 0x03); // 8 bits, no parity, one stop bit
     outb(UART_PORT_COM1 + 2, 0xC7); // Enable FIFO, clear them, with 14-byte threshold
     outb(UART_PORT_COM1 + 4, 0x0B); // IRQs enabled, RTS/DSR set
+    outb(UART_PORT_COM1 + 4, 0x1E); // Set in loopback mode, test the serial chip
+    outb(UART_PORT_COM1 + 0, 0xAE); // Test serial chip (send byte 0xAE and check if serial returns same byte)
+
+   // Check if serial is faulty (i.e: not same byte as sent)
+   if(inb(UART_PORT_COM1 + 0) != 0xAE) {
+      return 1;
+   }
+
+   // If serial is not faulty set it in normal operation mode
+   // (not-loopback with IRQs enabled and OUT#1 and OUT#2 bits enabled)
+   outb(UART_PORT_COM1 + 4, 0x0F);
+   return 0;
 }
 
 bool uart_is_recieve_buffer_empty(void)
