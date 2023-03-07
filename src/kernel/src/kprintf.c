@@ -6,8 +6,7 @@
 
 typedef void (*putc)(char);
 
-static void
-u64toa(uint64_t num, uint8_t base, char *bf)
+static void u64toa(uint64_t num, uint8_t base, char *bf)
 {
     uint64_t d = 1;
     while (num / d >= base)
@@ -24,8 +23,7 @@ u64toa(uint64_t num, uint8_t base, char *bf)
     *bf = 0;
 }
 
-static void
-u32toa(uint32_t num, uint8_t base, char *bf)
+static void u32toa(uint32_t num, uint8_t base, char *bf)
 {
     uint32_t d = 1;
 
@@ -44,16 +42,14 @@ u32toa(uint32_t num, uint8_t base, char *bf)
     *bf = 0;
 }
 
-static void
-puts(char *bf)
+static void puts(char *bf)
 {
     char c;
     while ((c = *bf++))
         uart_put_char(c);
 }
 
-static void
-format(putc putf, char *fmt, va_list va)
+static void format(putc putf, char *fmt, va_list va)
 {
     char bf[512];
     char ch;
@@ -91,8 +87,7 @@ format(putc putf, char *fmt, va_list va)
     }
 }
 
-void
-kprintf(char *fmt, ...)
+void kprintf(char *fmt, ...)
 {
     va_list va;
     va_start(va, fmt);

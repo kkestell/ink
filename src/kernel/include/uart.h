@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-void uart_init(void);
+int  uart_init(void);
 bool uart_is_recieve_buffer_empty(void);
 char uart_get_char(void);
 bool uart_is_transmit_buffer_empty(void);
