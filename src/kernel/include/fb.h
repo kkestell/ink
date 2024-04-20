@@ -1,5 +1,4 @@
-#ifndef _FB_H
-#define _FB_H
+#pragma once
 
 #include "boot_info.h"
 
@@ -23,5 +22,3 @@ hsv_color rgb_to_hsv(rgb_color rgb);
 uint32_t rgb_to_color(rgb_color rgb);
 void julia(framebuffer_info_t *framebuffer_info);
 void clear(framebuffer_info_t *framebuffer_info);
-
-#endif // _FB_H

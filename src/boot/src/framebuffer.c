@@ -34,7 +34,7 @@ EFI_STATUS framebuffer_init(kernel_framebuffer_info_t *framebuffer_info)
             return status;
         }
 
-        if (info->HorizontalResolution == 1280 && info->VerticalResolution == 720 && info->PixelFormat == PixelBlueGreenRedReserved8BitPerColor)
+        if (info->HorizontalResolution == 1024 && info->VerticalResolution == 768 && info->PixelFormat == PixelBlueGreenRedReserved8BitPerColor)
         {
             status = gop->SetMode(gop, i);
             if (EFI_ERROR(status))

@@ -5,6 +5,15 @@
 #include "boot_info.h"
 
 void
+bzero(void *ptr, size_t num);
+
+void
+memcpy(void *dest, void *src, size_t num);
+
+void *
+memset(void *ptr, int value, int num);
+
+void
 kalloc_init(memory_info_t *memory_info);
 
 void *
