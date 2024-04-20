@@ -773,7 +773,7 @@ typedef struct EFI_SYSTEM_TABLE
     EFI_CONFIGURATION_TABLE            *ConfigurationTable;
 } EFI_SYSTEM_TABLE;
 
-void *efi_image_handle;
-EFI_SYSTEM_TABLE *efi_system_table;
+extern void *efi_image_handle;
+extern EFI_SYSTEM_TABLE *efi_system_table;
 
 void efi_init(void *image_handle, EFI_SYSTEM_TABLE *system_table);

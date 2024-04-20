@@ -1,6 +1,9 @@
 #include "kprintf.h"
 #include "efi.h"
 
+void *efi_image_handle;
+EFI_SYSTEM_TABLE *efi_system_table;
+
 #define STATUS_CASE(symbol) \
     case symbol:            \
         return L#symbol;    \

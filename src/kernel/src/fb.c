@@ -1,3 +1,5 @@
+#include <stddef.h>
+#include "kalloc.h"
 #include "fb.h"
 
 void put_pixel(framebuffer_info_t *framebuffer_info, uint32_t x, uint32_t y, uint32_t c)
@@ -136,13 +138,12 @@ void julia(framebuffer_info_t *framebuffer_info)
 
 void clear(framebuffer_info_t *framebuffer_info)
 {
-    uint32_t c = 0x3b6ea5;
+    // Ensure the color is in the correct format expected by the framebuffer
+    uint32_t c = 0x000000; // Assuming a black color and the framebuffer uses 32-bit color depth
 
-    for (uint32_t y = 0; y < framebuffer_info->height; y++)
-    {
-        for (uint32_t x = 0; x < framebuffer_info->width; x++)
-        {
-            put_pixel(framebuffer_info, x, y, c);
-        }
-    }
+    // Calculate the total size of the framebuffer in bytes
+    size_t bufferSize = framebuffer_info->pixels_per_scan_line * framebuffer_info->height * sizeof(uint32_t);
+
+    // Use memset to fill the framebuffer with the color
+    memset((void*)framebuffer_info->base_address, c, bufferSize);
 }

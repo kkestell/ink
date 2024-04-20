@@ -5,6 +5,10 @@
 #define EfiMaxMemoryType      0x0000000e
 #define EfiConventionalMemory 0x00000007
 
+typedef struct {
+    size_t size;
+} alloc_header;
+
 uint8_t *head = NULL;
 
 void bzero(void *ptr, size_t num)
@@ -26,9 +30,7 @@ void memcpy(void *dest, void *src, size_t num)
 
 void *memset(void *ptr, int value, int num)
 {
-    int i;
     uint8_t *p = ptr;
-    i = 0;
     while(num > 0)
     {
         *p = value;
@@ -65,7 +67,6 @@ void kalloc_init(memory_info_t *memory_info)
         d = (memory_map_descriptor_t *)ptr;
     }
 
-    // FIXME: "um"? in output?
     kprintf("kalloc_init: mapped %U pages from %p to %p\n",
         page_count,
         start,
@@ -74,33 +75,57 @@ void kalloc_init(memory_info_t *memory_info)
     head = (uint8_t *)start;
 }
 
-void *kmalloc(size_t size)
-{
-    void *ptr = head;
-    head += size;
+void *kmalloc(size_t size) {
+    // Allocate memory for the header plus the requested size
+    size_t totalSize = size + sizeof(alloc_header);
+    alloc_header *header = (alloc_header *)head;
+    head += totalSize;
+
+    // Store the size in the header
+    header->size = size;
+
+    // Return the memory address after the header
+    void *ptr = (void *)(header + 1);
     kprintf("kmalloc: allocated %U bytes at %p\n", size, ptr);
     return ptr;
 }
 
-void kfree(void *ptr)
-{
-    kprintf("kmalloc: freeing ??? bytes at %p\n", ptr);   
+void kfree(void *ptr) {
+    // Retrieve the header
+    alloc_header *header = (alloc_header *)ptr - 1;
+    size_t size = header->size;
+
+    kprintf("kfree: freeing %U bytes at %p\n", size, ptr);
+
+    // Reset the head if this block is the most recently allocated
+    if ((uint8_t *)ptr + size == head) {
+        head = (uint8_t *)header;
+    }
+    // Note: This simplistic approach doesn't handle freeing of blocks not at the end or memory fragmentation
 }
 
-void *kcalloc(size_t number, size_t size)
-{
-    void *new = head;
-    head += number * size;
-    bzero(new, number * size);
-    kprintf("kcalloc: allocated %U bytes at %p\n", size, new);
-    return new;
+void *kcalloc(size_t number, size_t size) {
+    size_t totalSize = number * size;
+    void *ptr = kmalloc(totalSize);
+    bzero(ptr, totalSize);
+    return ptr;
 }
 
-void *krealloc(void *ptr, size_t size)
-{
-    void *new = head;
-    head += size;
-    memcpy(new, ptr, size);
-    kprintf("krealloc: allocated %U bytes at %p\n", size, new);
-    return new;
+void *krealloc(void *ptr, size_t newSize) {
+    if (!ptr) {
+        return kmalloc(newSize);
+    }
+
+    // Retrieve the old header and size
+    alloc_header *header = (alloc_header *)ptr - 1;
+    size_t oldSize = header->size;
+
+    // Allocate new memory and copy the old content
+    void *newPtr = kmalloc(newSize);
+    memcpy(newPtr, ptr, oldSize < newSize ? oldSize : newSize);
+
+    // Free the old block
+    kfree(ptr);
+
+    return newPtr;
 }

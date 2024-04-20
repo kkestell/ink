@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "uart.h"
+#include "console.h"
 
 typedef void (*putc)(char);
 
@@ -46,7 +47,7 @@ static void puts(char *bf)
 {
     char c;
     while ((c = *bf++))
-        uart_put_char(c);
+        console_putc(c);
 }
 
 static void format(putc putf, char *fmt, va_list va)
@@ -91,6 +92,6 @@ void kprintf(char *fmt, ...)
 {
     va_list va;
     va_start(va, fmt);
-    format(uart_put_char, fmt, va);
+    format(console_putc, fmt, va);
     va_end(va);
 }

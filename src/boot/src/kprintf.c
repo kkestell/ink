@@ -190,6 +190,16 @@ void kprintf_init(void (*putf)(wchar_t))
     stdout_putf = putf;
 }
 
+void die(wchar_t *fmt, ...)
+{
+    va_list va;
+    va_start(va, fmt);
+    format(stdout_putf, fmt, va);
+    va_end(va);
+    while (1)
+        ;
+}
+
 void kprintf(wchar_t *fmt, ...)
 {
     va_list va;
