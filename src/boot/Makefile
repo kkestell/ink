@@ -22,4 +22,3 @@ bin/bootx64.efi: $(OFILES)
 
 clean:
 	rm -rf bin obj > /dev/null 2> /dev/null || true
-

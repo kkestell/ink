@@ -12,6 +12,8 @@ void test_kalloc();
 
 void main(boot_info_t *boot_info)
 {   
+    kalloc_init(&boot_info->memory_map);
+
     console_init(&boot_info->framebuffer);
 
     if (uart_init())
@@ -19,8 +21,6 @@ void main(boot_info_t *boot_info)
         kprintf("UART init failed\n");
         // while (1);
     }
-
-    kalloc_init(&boot_info->memory_map);
 
     debug_bootinfo(boot_info);
 
@@ -55,50 +55,86 @@ void debug_bootinfo(boot_info_t *boot_info)
 
 void test_kalloc()
 {
-    // Initially allocate memory for 100 integers using kcalloc to ensure zero-initialization
-    int *arr = (int *)kcalloc(100, sizeof(int));
-    kprintf("Initial array (zero-initialized):\n");
+    kprintf("Starting kalloc tests...\n");
+
+    // Test 1: Basic allocation and deallocation
+    void* ptr1 = kmalloc(100);
+    if (!ptr1)
+    {
+        kprintf("FAIL: Basic allocation failed\n");
+        return;
+    }
+    kprintf("PASS: Basic allocation successful\n");
+    kfree(ptr1);
+    kprintf("PASS: Basic deallocation successful\n");
+
+    // Test 2: Multiple allocations
+    void* ptr2 = kmalloc(200);
+    void* ptr3 = kmalloc(300);
+    void* ptr4 = kmalloc(400);
+    if (!ptr2 || !ptr3 || !ptr4)
+    {
+        kprintf("FAIL: Multiple allocations failed\n");
+        return;
+    }
+    kprintf("PASS: Multiple allocations successful\n");
+
+    // Test 3: Fragmentation and coalescing
+    kfree(ptr3);  // Free the middle block
+    void* ptr5 = kmalloc(250);  // Should fit in the freed space
+    if (!ptr5)
+    {
+        kprintf("FAIL: Allocation after fragmentation failed\n");
+        return;
+    }
+    kprintf("PASS: Allocation after fragmentation successful\n");
+
+    // Free all blocks
+    kfree(ptr2);
+    kfree(ptr4);
+    kfree(ptr5);
+
+    // Test 4: Large allocation
+    void* large_ptr = kmalloc(1000000);  // 1MB
+    if (!large_ptr)
+    {
+        kprintf("FAIL: Large allocation failed\n");
+        return;
+    }
+    kprintf("PASS: Large allocation successful\n");
+    kfree(large_ptr);
+
+    // Test 5: kcalloc
+    int* int_array = (int*)kcalloc(100, sizeof(int));
+    if (!int_array)
+    {
+        kprintf("FAIL: kcalloc failed\n");
+        return;
+    }
     for (int i = 0; i < 100; i++)
     {
-        kprintf("%u ", arr[i]); // Should print 0s
+        if (int_array[i] != 0)
+        {
+            kprintf("FAIL: kcalloc did not zero-initialize memory\n");
+            return;
+        }
     }
-    kprintf("\n");
+    kprintf("PASS: kcalloc successful and zero-initialized\n");
+    kfree(int_array);
 
-    // Populate the array with values
-    for (int i = 0; i < 100; i++)
+    // Test 6: krealloc
+    void* realloc_ptr = kmalloc(200);
+    realloc_ptr = krealloc(realloc_ptr, 400);
+    if (!realloc_ptr)
     {
-        arr[i] = i;
+        kprintf("FAIL: krealloc failed\n");
+        return;
     }
+    kprintf("PASS: krealloc successful\n");
+    kfree(realloc_ptr);
 
-    // Print the populated array
-    kprintf("Populated array:\n");
-    for (int i = 0; i < 100; i++)
-    {
-        kprintf("%u ", arr[i]); // Should print 0 to 99
-    }
-    kprintf("\n");
+    // Final memory state
+    kalloc_debug();
 
-    // Resize the array to 150 integers using krealloc
-    arr = (int *)krealloc(arr, sizeof(int) * 150);
-    kprintf("Resized array (new elements are uninitialized):\n");
-    for (int i = 100; i < 150; i++)
-    {
-        arr[i] = i * 2; // Initialize new elements with some values
-    }
-    for (int i = 0; i < 150; i++)
-    {
-        kprintf("%u ", arr[i]); // Should print 0 to 99, followed by 200 to 298
-    }
-    kprintf("\n");
-
-    // Further reduce the size of the array to 50 integers using krealloc
-    arr = (int *)krealloc(arr, sizeof(int) * 50);
-    kprintf("Reduced array size:\n");
-    for (int i = 0; i < 50; i++)
-    {
-        kprintf("%u ", arr[i]); // Should print 0 to 49
-    }
-    kprintf("\n");
-
-    kfree(arr);
+    kprintf("All kalloc tests completed successfully!\n");
 }

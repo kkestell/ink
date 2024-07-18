@@ -1,131 +1,255 @@
-#include <string.h>
+#include <stdint.h>
+#include <stdbool.h>
 #include "kalloc.h"
 #include "kprintf.h"
 
 #define EfiMaxMemoryType      0x0000000e
 #define EfiConventionalMemory 0x00000007
 
-typedef struct {
+typedef struct block_header
+{
     size_t size;
-} alloc_header;
+    bool is_free;
+    struct block_header* next;
+} block_header;
 
-uint8_t *head = NULL;
+static block_header* free_list = NULL;
+static void* heap_start = NULL;
+static void* heap_end = NULL;
 
-void bzero(void *ptr, size_t num)
-{
-  uint8_t *p = (uint8_t *)ptr;
-  size_t i;
-  for (i = 0; i < num; i++)
-    p[i] = '\0';
-}
-
-void memcpy(void *dest, void *src, size_t num)
-{
-    uint8_t *cs = (uint8_t *)src;
-    uint8_t *cd = (uint8_t *)dest;
- 
-    for (size_t i = 0; i < num; i++)
-        cd[i] = cs[i];
-}
-
-void *memset(void *ptr, int value, int num)
-{
-    uint8_t *p = ptr;
-    while(num > 0)
-    {
-        *p = value;
-        p++;
-        num--;
-    }
-    return(ptr);
-}
-
-void kalloc_debug()
-{
-}
+// Memory statistics
+static size_t total_allocated = 0;
+static size_t total_free = 0;
+static size_t peak_allocated = 0;
+static size_t allocation_count = 0;
+static size_t free_count = 0;
 
 void kalloc_init(memory_info_t *memory_info)
 {
     memory_map_descriptor_t *d = memory_info->memory_map;
+    uint64_t largest_block = 0;
+    void* largest_block_start = NULL;
 
-    uint64_t *start = NULL;
-    uint64_t page_count = 0;
-
-    for (uint64_t i = 0; i < memory_info->size / memory_info->descriptor_size; i++)
-    {
-        if (d->type == EfiConventionalMemory)
-        {
-            if (d->page_count > page_count)
+    for (uint64_t i = 0; i < memory_info->size / memory_info->descriptor_size; i++) {
+        if (d->type == EfiConventionalMemory) {
+            uint64_t block_size = d->page_count * 4096;
+            if (block_size > largest_block)
             {
-                start = (uint64_t *)d->physical_start;
-                page_count = d->page_count;
+                largest_block = block_size;
+                largest_block_start = (void*)d->physical_start;
             }
         }
-
-        uint8_t *ptr = ((uint8_t *)d);
-        ptr += memory_info->descriptor_size;
-        d = (memory_map_descriptor_t *)ptr;
+        d = (memory_map_descriptor_t*)((uint8_t*)d + memory_info->descriptor_size);
     }
 
-    kprintf("kalloc_init: mapped %U pages from %p to %p\n",
-        page_count,
-        start,
-        (uint64_t *)(((uint8_t *)start) + page_count * 4096));
+    heap_start = (void*)ALIGN((uintptr_t)largest_block_start);
+    heap_end = (void*)ALIGN((uintptr_t)heap_start + largest_block);
 
-    head = (uint8_t *)start;
+    // Initialize the free list with a single large block
+    free_list = (block_header*)heap_start;
+    free_list->size = (uintptr_t)heap_end - (uintptr_t)heap_start - sizeof(block_header);
+    free_list->is_free = true;
+    free_list->next = NULL;
+
+    total_free = free_list->size;
+
+    // kprintf("kalloc_init: Heap initialized from %p to %p, size: %U bytes\n", 
+    //         heap_start, heap_end, (uintptr_t)heap_end - (uintptr_t)heap_start);
 }
 
-void *kmalloc(size_t size) {
-    // Allocate memory for the header plus the requested size
-    size_t totalSize = size + sizeof(alloc_header);
-    alloc_header *header = (alloc_header *)head;
-    head += totalSize;
+static block_header* find_free_block(size_t size)
+{
+    block_header* current = free_list;
+    while (current)
+    {
+        if (current->is_free && current->size >= size)
+        {
+            return current;
+        }
+        current = current->next;
+    }
+    return NULL;
+}
 
-    // Store the size in the header
-    header->size = size;
+static void split_block(block_header* block, size_t size)
+{
+    size_t remaining_size = block->size - size - sizeof(block_header);
+    if (remaining_size >= MIN_BLOCK_SIZE)
+    {
+        block_header* new_block = (block_header*)((uint8_t*)block + sizeof(block_header) + size);
+        new_block->size = remaining_size;
+        new_block->is_free = true;
+        new_block->next = block->next;
 
-    // Return the memory address after the header
-    void *ptr = (void *)(header + 1);
-    kprintf("kmalloc: allocated %U bytes at %p\n", size, ptr);
+        block->size = size;
+        block->next = new_block;
+
+        total_free += remaining_size;
+    }
+}
+
+void* kmalloc(size_t size)
+{
+    size = ALIGN(size);
+    block_header* block = find_free_block(size);
+
+    if (!block)
+    {
+        kprintf("kmalloc: Out of memory\n");
+        return NULL;
+    }
+
+    block->is_free = false;
+    split_block(block, size);
+
+    total_allocated += block->size;
+    total_free -= block->size;
+    allocation_count++;
+
+    if (total_allocated > peak_allocated)
+    {
+        peak_allocated = total_allocated;
+    }
+
+    void* result = (void*)((uint8_t*)block + sizeof(block_header));
+    kprintf("kmalloc: Allocated %U bytes at %p\n", block->size, result);
+    return result;
+}
+
+static void merge_free_blocks(void)
+{
+    block_header* current = free_list;
+    while (current && current->next)
+    {
+        if (current->is_free && current->next->is_free)
+        {
+            current->size += sizeof(block_header) + current->next->size;
+            current->next = current->next->next;
+            total_free += sizeof(block_header);
+        }
+        else
+        {
+            current = current->next;
+        }
+    }
+}
+
+void kfree(void* ptr)
+{
+    if (!ptr) 
+    {
+        return;
+    }
+
+    block_header* block = (block_header*)((uint8_t*)ptr - sizeof(block_header));
+    block->is_free = true;
+
+    total_allocated -= block->size;
+    total_free += block->size;
+    free_count++;
+
+    kprintf("kfree: Freed %U bytes at %p\n", block->size, ptr);
+
+    merge_free_blocks();
+}
+
+void* kcalloc(size_t num, size_t size)
+{
+    size_t total_size = num * size;
+    void* ptr = kmalloc(total_size);
+    if (ptr)
+    {
+        memset(ptr, 0, total_size);
+    }
     return ptr;
 }
 
-void kfree(void *ptr) {
-    // Retrieve the header
-    alloc_header *header = (alloc_header *)ptr - 1;
-    size_t size = header->size;
-
-    kprintf("kfree: freeing %U bytes at %p\n", size, ptr);
-
-    // Reset the head if this block is the most recently allocated
-    if ((uint8_t *)ptr + size == head) {
-        head = (uint8_t *)header;
-    }
-    // Note: This simplistic approach doesn't handle freeing of blocks not at the end or memory fragmentation
-}
-
-void *kcalloc(size_t number, size_t size) {
-    size_t totalSize = number * size;
-    void *ptr = kmalloc(totalSize);
-    bzero(ptr, totalSize);
-    return ptr;
-}
-
-void *krealloc(void *ptr, size_t newSize) {
-    if (!ptr) {
-        return kmalloc(newSize);
+void* krealloc(void* ptr, size_t new_size)
+{
+    if (!ptr) 
+    {
+        return kmalloc(new_size);
     }
 
-    // Retrieve the old header and size
-    alloc_header *header = (alloc_header *)ptr - 1;
-    size_t oldSize = header->size;
+    if (new_size == 0)
+    {
+        kfree(ptr);
+        return NULL;
+    }
 
-    // Allocate new memory and copy the old content
-    void *newPtr = kmalloc(newSize);
-    memcpy(newPtr, ptr, oldSize < newSize ? oldSize : newSize);
+    block_header* old_block = (block_header*)((uint8_t*)ptr - sizeof(block_header));
+    if (new_size <= old_block->size)
+    {
+        // Shrink the block if necessary
+        split_block(old_block, new_size);
+        return ptr;
+    }
 
-    // Free the old block
+    // Allocate a new block
+    void* new_ptr = kmalloc(new_size);
+    if (!new_ptr)
+    {
+        return NULL;
+    }
+
+    // Copy old data and free old block
+    memcpy(new_ptr, ptr, old_block->size);
     kfree(ptr);
 
-    return newPtr;
+    return new_ptr;
+}
+
+void kalloc_debug(void)
+{
+    block_header* current = free_list;
+    size_t block_count = 0;
+    size_t free_block_count = 0;
+    size_t largest_free_block = 0;
+
+    kprintf("Memory Map:\n");
+    while (current)
+    {
+        kprintf("Block at %p, size: %U, %s\n", current, current->size, current->is_free ? "free" : "used");
+        if (current->is_free)
+        {
+            free_block_count++;
+            if (current->size > largest_free_block)
+            {
+                largest_free_block = current->size;
+            }
+        }
+        block_count++;
+        current = current->next;
+    }
+
+    kprintf("Total blocks: %U\n", block_count);
+    kprintf("Free blocks: %U\n", free_block_count);
+    kprintf("Total allocated memory: %U bytes\n", total_allocated);
+    kprintf("Total free memory: %U bytes\n", total_free);
+    kprintf("Peak allocated memory: %U bytes\n", peak_allocated);
+    kprintf("Largest free block: %U bytes\n", largest_free_block);
+    kprintf("Total allocations: %U\n", allocation_count);
+    kprintf("Total frees: %U\n", free_count);
+    kprintf("Current fragmentation: %U%%\n", (block_count > 1) ? (block_count - 1) * 100 / (block_count) : 0);
+}
+
+void* memcpy(void* dest, void* src, size_t n)
+{
+    unsigned char* d = (unsigned char*)dest;
+    const unsigned char* s = (const unsigned char*)src;
+    for (size_t i = 0; i < n; i++)
+    {
+        d[i] = s[i];
+    }
+    return dest;
+}
+
+void* memset(void* s, int c, size_t n)
+{
+    unsigned char* p = (unsigned char*)s;
+    for (size_t i = 0; i < n; i++)
+    {
+        p[i] = (unsigned char)c;
+    }
+    return s;
 }
