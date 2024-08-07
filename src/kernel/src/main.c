@@ -19,12 +19,12 @@ void main(boot_info_t *boot_info)
     if (uart_init())
     {
         kprintf("UART init failed\n");
-        // while (1);
     }
 
-    debug_bootinfo(boot_info);
+    kprintf_test();
 
-    test_kalloc();
+    //debug_bootinfo(boot_info);
+    // test_kalloc();
 
     while (1);
 }

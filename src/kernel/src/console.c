@@ -36,7 +36,7 @@ void console_clear(void)
     cursor_y = 0;
 }
 
-void console_putc(char c)
+void console_put_char(char c)
 {
     switch (c)
     {
@@ -63,14 +63,6 @@ void console_putc(char c)
     {
         scroll_screen();
         cursor_y = fb_info->height - FONT_HEIGHT;
-    }
-}
-
-void console_puts(const char *s)
-{
-    while (*s)
-    {
-        console_putc(*s++);
     }
 }
 

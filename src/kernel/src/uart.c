@@ -6,6 +6,8 @@
 
 #define UART_PORT_COM1 0x3f8
 
+static bool uart_available = false;
+
 int uart_init(void)
 {
     outb(UART_PORT_COM1 + 1, 0x00); // Disable all interrupts
@@ -20,13 +22,20 @@ int uart_init(void)
 
    // Check if serial is faulty (i.e: not same byte as sent)
    if(inb(UART_PORT_COM1 + 0) != 0xAE) {
-      return 1;
+        uart_available = false;
+        return 1;
    }
 
    // If serial is not faulty set it in normal operation mode
    // (not-loopback with IRQs enabled and OUT#1 and OUT#2 bits enabled)
    outb(UART_PORT_COM1 + 4, 0x0F);
+   uart_available = true;
    return 0;
+}
+
+bool uart_is_available(void)
+{
+    return uart_available;
 }
 
 bool uart_is_recieve_buffer_empty(void)

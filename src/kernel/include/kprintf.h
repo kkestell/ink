@@ -4,4 +4,7 @@
 void
 kprintf(char *fmt, ...);
 
+void
+kprintf_test(void);
+
 #endif  // _KPRINTF_H_
