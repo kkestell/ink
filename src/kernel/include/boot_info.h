@@ -1,5 +1,4 @@
-#ifndef _BOOT_INFO_H
-#define _BOOT_INFO_H
+#pragma once
 
 #include <stdint.h>
 
@@ -52,5 +51,3 @@ typedef struct boot_info
     memory_info_t      memory_map;
     framebuffer_info_t framebuffer;
 } boot_info_t;
-
-#endif // _BOOT_INFO_H

@@ -1,5 +1,4 @@
-#ifndef _KMALLOC_H
-#define _KMALLOC_H
+#pragma once
 
 #include <stddef.h>
 #include "boot_info.h"
@@ -34,5 +33,3 @@ krealloc(void *ptr, size_t size);
 
 void
 kalloc_debug(void);
-
-#endif

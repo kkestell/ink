@@ -3,7 +3,7 @@
 #include "kprintf.h"
 
 /*
-void print_elf_file_info(void *const header_ptr, void *const program_headers_ptr)
+void elf_print_file_info(void *const header_ptr, void *const program_headers_ptr)
 {
     elf_header_t* header = (elf_header_t*)header_ptr;
 

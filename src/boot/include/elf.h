@@ -60,6 +60,14 @@ typedef struct elf_program_header
     UINT64 p_align;
 } elf_program_header;
 
-EFI_STATUS elf_read_identity(EFI_FILE_PROTOCOL *const kernel_image_file, UINT8 **elf_identity_buffer);
-EFI_STATUS elf_read_file(EFI_FILE_PROTOCOL *const kernel_image_file, void **kernel_header_buffer, void **kernel_program_headers_buffer);
-EFI_STATUS elf_validate_identity(UINT8 *const elf_identity_buffer);
+EFI_STATUS
+elf_read_identity(EFI_FILE_PROTOCOL *const kernel_image_file, UINT8 **elf_identity_buffer);
+
+EFI_STATUS
+elf_read_file(EFI_FILE_PROTOCOL *const kernel_image_file, void **kernel_header_buffer, void **kernel_program_headers_buffer);
+
+EFI_STATUS
+elf_validate_identity(UINT8 *const elf_identity_buffer);
+
+// void
+// elf_print_file_info(void *const header_ptr, void *const program_headers_ptr);

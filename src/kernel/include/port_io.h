@@ -1,9 +1,9 @@
-#ifndef _PORT_IO_H
-#define _PORT_IO_H
+#pragma once
 
 #include <stdint.h>
 
-uint8_t inb(uint16_t port);
-void outb(uint16_t port, uint8_t val);
+uint8_t
+inb(uint16_t port);
 
-#endif // _PORT_IO_H
+void
+outb(uint16_t port, uint8_t val);

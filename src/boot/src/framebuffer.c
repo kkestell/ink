@@ -5,15 +5,20 @@
 EFI_STATUS framebuffer_init(kernel_framebuffer_info_t *framebuffer_info)
 {
     EFI_STATUS status;
-
     EFI_GRAPHICS_OUTPUT_PROTOCOL *gop;
     
     EFI_GUID guid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
     EFI_BS_CALL(LocateProtocol(&guid, 0, (void **)&gop));
 
+    if (gop == NULL)
+    {
+        kprintf(L"Unable to locate GOP\r\n");
+        return EFI_UNSUPPORTED;
+    }
+
     status = gop->QueryMode(gop, gop->Mode == 0 ? 0 : gop->Mode->Mode, NULL, NULL);
     if (status == EFI_NOT_STARTED)
-    {        
+    {
         status = gop->SetMode(gop, 0);
         if (EFI_ERROR(status))
         {
@@ -30,11 +35,26 @@ EFI_STATUS framebuffer_init(kernel_framebuffer_info_t *framebuffer_info)
         status = gop->QueryMode(gop, i, &info_size, &info);
         if (EFI_ERROR(status))
         {
-            kprintf(L"Error querying mode");
-            return status;
+            kprintf(L"Error querying mode %d\r\n", i);
+            continue;
         }
 
-        if (info->HorizontalResolution == 1280 && info->VerticalResolution == 720 && info->PixelFormat == PixelBlueGreenRedReserved8BitPerColor)
+        kprintf(L"Mode %d: %dx%d, PixelFormat=%d\r\n", i, info->HorizontalResolution, info->VerticalResolution, info->PixelFormat);
+    }
+
+    for (uint32_t i = 0; i < gop->Mode->MaxMode; i++)
+    {
+        UINTN info_size;
+        EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *info;
+
+        status = gop->QueryMode(gop, i, &info_size, &info);
+        if (EFI_ERROR(status))
+        {
+            kprintf(L"Error querying mode %d\r\n", i);
+            continue;
+        }
+
+        if (info->HorizontalResolution == 1024 && info->VerticalResolution == 768)
         {
             status = gop->SetMode(gop, i);
             if (EFI_ERROR(status))
@@ -55,6 +75,6 @@ EFI_STATUS framebuffer_init(kernel_framebuffer_info_t *framebuffer_info)
         }
     }
 
-    kprintf(L"Requested display resolution not available");
+    kprintf(L"Requested display resolution not available\r\n");
     return EFI_UNSUPPORTED;
 }
